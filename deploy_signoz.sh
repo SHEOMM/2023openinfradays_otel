@@ -53,12 +53,12 @@ kubectl apply -f otel/crd.yaml
 echo "Building and deploying client application..."
 cd client
 sudo ./gradlew jibDockerBuild
-kubectl apply -f crd.yaml
+kubectl apply -f kube.yaml
 
 echo "Building and deploying server application..."
 cd ../server
 sudo ./gradlew jibDockerBuild
-kubectl apply -f crd.yaml
+kubectl apply -f kube.yaml
 
 cd ..
 
