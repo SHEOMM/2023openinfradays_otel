@@ -19,7 +19,7 @@ helm upgrade -i signoz signoz/signoz \
   --namespace metric \
   --wait \
   --timeout 20m \
-  -f signoz/values.yaml
+  -f signoz/value.yaml
 
 # Prometheus 설치 (SigNoz 연동 설정 포함)
 echo "Installing Prometheus..."
@@ -53,12 +53,12 @@ kubectl apply -f otel/crd.yaml
 echo "Building and deploying client application..."
 cd client
 sudo ./gradlew jibDockerBuild
-kubectl apply -f kube.yaml
+kubectl apply -f crd.yaml
 
 echo "Building and deploying server application..."
 cd ../server
 sudo ./gradlew jibDockerBuild
-kubectl apply -f kube.yaml
+kubectl apply -f crd.yaml
 
 cd ..
 
