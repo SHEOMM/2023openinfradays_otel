@@ -2,7 +2,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: otel-instrumentation
-  namespace: metric
+  namespace: otel
 spec:
   exporter:
     endpoint: http://signoz-otel-collector.metric.svc.cluster.local:4317
