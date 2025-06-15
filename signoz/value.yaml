@@ -3,33 +3,3 @@ global:
 
 clickhouse:
   installCustomStorageClass: true
-  persistence:
-    size: 20Gi
-
-# SigNoz 설정
-frontend:
-  service:
-    type: ClusterIP
-    port: 3301
-
-query-service:
-  service:
-    type: ClusterIP
-    port: 8080
-
-otelCollector:
-  enabled: true
-  service:
-    type: ClusterIP
-    ports:
-      otlp-grpc: 4317
-      otlp-http: 4318
-
-# 리소스 제한 설정 (선택사항)
-resources:
-  limits:
-    cpu: 1000m
-    memory: 2Gi
-  requests:
-    cpu: 500m
-    memory: 1Gi
