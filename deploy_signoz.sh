@@ -9,15 +9,15 @@ helm repo update
 # 네임스페이스 생성
 kubectl create namespace metric --dry-run=client -o yaml | kubectl apply -f -
 
-# SigNoz 설치 (OTel Collector 비활성화)
-echo "Installing SigNoz without OTel Collector..."
+# SigNoz 설치
+echo "Installing SigNoz..."
 helm upgrade -i signoz signoz/signoz \
   --namespace metric \
   --wait \
   --timeout 20m \
   -f signoz/values.yaml
 
-# SigNoz OTLP 서비스 추가 (직접 수신용)
+# SigNoz OTLP 서비스 추가
 echo "Creating SigNoz OTLP service..."
 kubectl apply -f signoz/service-patch.yaml
 
@@ -27,46 +27,55 @@ helm upgrade -i prometheus prometheus-community/prometheus \
   -f prometheus/values.yaml \
   -n metric
 
-# Grafana 설치 (선택사항)
+# Grafana 설치
 echo "Installing Grafana..."
 helm upgrade -i grafana grafana/grafana -n metric
 
-# Loki와 Promtail 설치
-echo "Installing Loki and Promtail..."
-helm upgrade -i -f loki/values.yaml loki grafana/loki -n metric
+# Loki 설치 (수정된 values 사용)
+echo "Installing Loki..."
+helm upgrade -i loki grafana/loki \
+  --set loki.commonConfig.replication_factor=1 \
+  --set loki.storage.type=filesystem \
+  --set loki.auth_enabled=false \
+  --set singleBinary.replicas=1 \
+  --set backend.replicas=0 \
+  --set read.replicas=0 \
+  --set write.replicas=0 \
+  -n metric
+
+# Promtail 설치
+echo "Installing Promtail..."
 helm upgrade -i promtail grafana/promtail -n metric
 
-# OpenTelemetry Operator 설치
+# OpenTelemetry Operator 설치 (수정된 설정)
 echo "Setting up OpenTelemetry..."
 kubectl create namespace otel --dry-run=client -o yaml | kubectl apply -f -
 helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
 helm upgrade -i opentelemetry-operator open-telemetry/opentelemetry-operator \
   -n otel \
   --set admissionWebhooks.certManager.enabled=false \
-  --set admissionWebhooks.autoGenerateCert=true \
+  --set admissionWebhooks.autoGenerateCert.enabled=true \
   --wait
+
+# OpenTelemetry CRD가 준비될 때까지 대기
+echo "Waiting for OpenTelemetry CRDs..."
+kubectl wait --for condition=established --timeout=60s crd/instrumentations.opentelemetry.io
 
 # OpenTelemetry Instrumentation CRD 적용
 kubectl apply -f otel/crd.yaml
 
 # 애플리케이션 빌드 및 배포
-echo "Building and deploying client application..."
+echo "Building and deploying applications..."
 cd client
 sudo ./gradlew jibDockerBuild
 kubectl apply -f kube.yaml
 
-echo "Building and deploying server application..."
 cd ../server
 sudo ./gradlew jibDockerBuild
 kubectl apply -f kube.yaml
 
 cd ..
 
-# 접속 정보 출력
 echo ""
-echo "=== 접속 정보 ==="
+echo "=== 배포 완료 ==="
 echo "SigNoz UI: kubectl port-forward -n metric svc/signoz-frontend 3301:3301"
-echo "SigNoz URL: http://localhost:3301"
-echo ""
-echo "=== 서비스 확인 ==="
-kubectl get svc -n metric | grep signoz

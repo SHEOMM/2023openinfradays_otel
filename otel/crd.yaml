@@ -2,7 +2,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: otel-instrumentation
-  namespace: otel
+  namespace: metric
 spec:
   exporter:
     endpoint: http://signoz-otel-collector.metric.svc.cluster.local:4317
@@ -19,7 +19,7 @@ spec:
       - name: OTEL_EXPORTER_OTLP_PROTOCOL
         value: grpc
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://signoz.metric.svc.cluster.local:4317
+        value: http://signoz-otel-collector.metric.svc.cluster.local:4317
       - name: OTEL_METRICS_EXPORTER
         value: prometheus
       - name: OTEL_METRICS_EXEMPLAR_FILTER
@@ -28,3 +28,7 @@ spec:
         value: spring-application
       - name: OTEL_RESOURCE_ATTRIBUTES
         value: service.name=spring-application,service.version=1.0.0
+      - name: OTEL_LOGS_EXPORTER
+        value: otlp
+      - name: OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
+        value: http://signoz-otel-collector.metric.svc.cluster.local:4317
