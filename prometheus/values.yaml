@@ -3,6 +3,13 @@ server:
     - web.enable-remote-write-receiver
     - web.enable-lifecycle
     - enable-feature=exemplar-storage
+    # SigNoz와의 연동을 위한 설정
+  remoteWrite:
+    - url: http://signoz-otel-collector.metric.svc.cluster.local:4318/v1/metrics
+      writeRelabelConfigs:
+        - sourceLabels: [ __name__ ]
+          regex: 'prometheus_.*'
+          action: drop
 # adds additional scrape configs to prometheus.yml
 # must be a string so you have to add a | after extraScrapeConfigs:
 # example adds prometheus-blackbox-exporter scrape config
@@ -37,6 +44,11 @@ extraScrapeConfigs: |
     # [Optional] Include all pod labels as labels for each metric
     - action: labelmap
       regex: __meta_kubernetes_pod_label_(.+)
+    # SigNoz 메트릭 스크래핑
+    - job_name: 'signoz'
+      static_configs:
+        - targets: ['signoz-query-service.metric.svc.cluster.local:8080']
+      metrics_path: /metrics
 
 alertmanager:
   ## If false, alertmanager will not be installed
