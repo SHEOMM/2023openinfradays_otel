@@ -24,10 +24,7 @@ spec:
         value: prometheus
       - name: OTEL_METRICS_EXEMPLAR_FILTER
         value: always_on
-      - name: OTEL_SERVICE_NAME
-        value: spring-application
-      - name: OTEL_RESOURCE_ATTRIBUTES
-        value: service.name=spring-application,service.version=1.0.0
+      # 기본 서비스명 제거 - 각 애플리케이션에서 개별 설정
       - name: OTEL_LOGS_EXPORTER
         value: otlp
       - name: OTEL_EXPORTER_OTLP_LOGS_ENDPOINT

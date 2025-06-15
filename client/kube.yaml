@@ -15,26 +15,27 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9464"
+        instrumentation.opentelemetry.io/inject-java: "otel/otel-instrumentation"
+        instrumentation.opentelemetry.io/container-names: "spring-client"
     spec:
       containers:
-      - name: spring-client
-        image: spring-client:latest
-        imagePullPolicy: Never
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: spring-client
-  namespace: metric
-spec:
-  type: ClusterIP
-  selector:
-    app: spring-client
-  ports:
-  - port: 8080
-    name: app
-    targetPort: 8080
-  - port: 9464
-    name: metric
-    targetPort: 9464
-
+        - name: spring-client
+          image: spring-client:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9464
+              name: metrics
+          env:
+            # 명시적 서비스명 설정
+            - name: OTEL_SERVICE_NAME
+              value: "spring-client"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "service.name=spring-client,service.version=1.0.0,deployment.environment=development"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://signoz-otel-collector.metric.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
