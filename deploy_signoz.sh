@@ -9,29 +9,29 @@ helm repo update
 # 네임스페이스 생성
 kubectl create namespace metric --dry-run=client -o yaml | kubectl apply -f -
 
-# 스토리지 클래스 확인 (필요시 values.yaml에서 수정)
-echo "Available storage classes:"
-kubectl get storageclass
-
-# SigNoz 설치 (Tempo 대신)
-echo "Installing SigNoz..."
+# SigNoz 설치 (OTel Collector 비활성화)
+echo "Installing SigNoz without OTel Collector..."
 helm upgrade -i signoz signoz/signoz \
   --namespace metric \
   --wait \
   --timeout 20m \
-  -f signoz/value.yaml
+  -f signoz/values.yaml
 
-# Prometheus 설치 (SigNoz 연동 설정 포함)
+# SigNoz OTLP 서비스 추가 (직접 수신용)
+echo "Creating SigNoz OTLP service..."
+kubectl apply -f signoz/service-patch.yaml
+
+# Prometheus 설치
 echo "Installing Prometheus..."
 helm upgrade -i prometheus prometheus-community/prometheus \
   -f prometheus/values.yaml \
   -n metric
 
-# Grafana 설치 (선택사항 - SigNoz UI 사용 가능)
+# Grafana 설치 (선택사항)
 echo "Installing Grafana..."
 helm upgrade -i grafana grafana/grafana -n metric
 
-# Loki와 Promtail 설치 (로그 수집용)
+# Loki와 Promtail 설치
 echo "Installing Loki and Promtail..."
 helm upgrade -i -f loki/values.yaml loki grafana/loki -n metric
 helm upgrade -i promtail grafana/promtail -n metric
@@ -68,7 +68,5 @@ echo "=== 접속 정보 ==="
 echo "SigNoz UI: kubectl port-forward -n metric svc/signoz-frontend 3301:3301"
 echo "SigNoz URL: http://localhost:3301"
 echo ""
-echo "Grafana: kubectl port-forward -n metric svc/grafana 7777:80"
-echo "Grafana admin password:"
-kubectl get secret --namespace metric grafana -o jsonpath="{.data.admin-password}" | base64 --decode
-echo ""
+echo "=== 서비스 확인 ==="
+kubectl get svc -n metric | grep signoz

@@ -23,13 +23,17 @@ spec:
         image: spring-server:latest
         imagePullPolicy: Never
         env:
-          # SigNoz 연동을 위한 환경변수
+          # SigNoz Query Service로 직접 전송
           - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            value: "http://signoz-otel-collector.metric.svc.cluster.local:4317"
+            value: "http://signoz.metric.svc.cluster.local:4317"
+          - name: OTEL_EXPORTER_OTLP_PROTOCOL
+            value: "grpc"
+          - name: OTEL_TRACES_EXPORTER
+            value: "otlp"
           - name: OTEL_SERVICE_NAME
             value: "spring-server"
           - name: OTEL_RESOURCE_ATTRIBUTES
-            value: "service.name=spring-server,service.version=1.0.0"
+            value: "service.name=spring-server,service.version=1.0.0,deployment.environment=development"
 ---
 apiVersion: v1
 kind: Service

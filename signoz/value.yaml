@@ -1,21 +1,63 @@
 global:
-  storageClass: standard  # 클러스터의 스토리지 클래스에 맞게 수정
+  storageClass: standard
 
 clickhouse:
-  installCustomStorageClass: true
+  installCustomStorageClass: false
   persistence:
+    enabled: true
     size: 5Gi
+    storageClass: standard
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
 
-# SigNoz 설정
+# SigNoz Frontend 설정
 frontend:
   service:
     type: ClusterIP
     port: 3301
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
 
+# Query Service 설정 (직접 OTLP 수신)
 query-service:
   service:
     type: ClusterIP
     port: 8080
+    # OTLP 수신을 위한 추가 포트
+    otlpPort: 4317
+    otlpHttpPort: 4318
+  # 헬스체크 프로브 설정 조정
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 6
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+# OTel Collector 비활성화
+otelCollector:
+  enabled: false
 
 # 리소스 제한 설정 (선택사항)
 resources:

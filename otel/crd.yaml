@@ -14,7 +14,17 @@ spec:
     argument: "1"
   java:
     env:
+      - name: OTEL_TRACES_EXPORTER
+        value: otlp
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: grpc
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://signoz.metric.svc.cluster.local:4317
       - name: OTEL_METRICS_EXPORTER
         value: prometheus
       - name: OTEL_METRICS_EXEMPLAR_FILTER
         value: always_on
+      - name: OTEL_SERVICE_NAME
+        value: spring-application
+      - name: OTEL_RESOURCE_ATTRIBUTES
+        value: service.name=spring-application,service.version=1.0.0
