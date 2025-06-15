@@ -3,3 +3,25 @@ global:
 
 clickhouse:
   installCustomStorageClass: true
+  persistence:
+    size: 5Gi
+
+# SigNoz 설정
+frontend:
+  service:
+    type: ClusterIP
+    port: 3301
+
+query-service:
+  service:
+    type: ClusterIP
+    port: 8080
+
+# 리소스 제한 설정 (선택사항)
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
