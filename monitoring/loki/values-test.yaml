@@ -41,6 +41,8 @@ ruler:
 
 loki:
   auth_enabled: false
+  #  Loki 6.30.1 부터는 설정이 필수?
+  useTestSchema: true
   commonConfig:
     replication_factor: 1
   storage:
