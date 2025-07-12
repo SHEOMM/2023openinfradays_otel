@@ -16,6 +16,11 @@ releases:
         value: minioadmin
       - name: rootPassword
         value: minioadmin123
+      - name: mode
+        value: standalone
+      - name: replicas
+        value: 1
+
   - name: loki
     namespace: monitoring
     createNamespace: true
