@@ -1,7 +1,5 @@
 mode: deployment
-
-deployment:
-  replicas: 1
+replicaCount: 1
 
 autoscaling:
   enabled: false
