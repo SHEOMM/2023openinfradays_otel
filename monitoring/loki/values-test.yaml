@@ -1,4 +1,5 @@
 # loki/values-test.yaml
+
 deploymentMode: SingleBinary
 
 singleBinary:
@@ -11,6 +12,32 @@ singleBinary:
     limits:
       cpu: 500m
       memory: 512Mi
+
+# SimpleScalable 모드 컴포넌트들을 명시적으로 비활성화
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+
+# 기존 scalable 컴포넌트들도 명시적으로 비활성화
+distributor:
+  replicas: 0
+ingester:
+  replicas: 0
+querier:
+  replicas: 0
+queryFrontend:
+  replicas: 0
+queryScheduler:
+  replicas: 0
+compactor:
+  replicas: 0
+indexGateway:
+  replicas: 0
+ruler:
+  replicas: 0
 
 loki:
   auth_enabled: false
@@ -34,9 +61,6 @@ loki:
     max_line_size: 128KB
     reject_old_samples: true
     reject_old_samples_max_age: 24h
-
-# 개별 컴포넌트 설정 제거
-# distributor, ingester, querier 설정은 singleBinary 모드에서 불필요
 
 persistence:
   enabled: true
