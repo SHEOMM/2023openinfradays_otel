@@ -1,0 +1,54 @@
+releases:
+  - name: cert-manager
+    namespace: cert-manager
+    chart: jetstack/cert-manager
+    version: v1.17.4
+    createNamespace: true
+    set:
+      - name: installCRDs
+        value: true
+
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    chart: prometheus-community/kube-prometheus-stack
+    version: 70.4.2
+    values:
+      - "../prometheus-operator/values-test.yaml"
+    wait: true
+
+  - name: loki
+    namespace: monitoring
+    chart: grafana/loki
+    version: 6.30.1
+    values:
+      - "../loki/values-test.yaml"
+    needs:
+      - monitoring/kube-prometheus-stack
+
+  - name: tempo
+    namespace: monitoring
+    chart: grafana/tempo
+    version: 1.23.2
+    values:
+      - "../tempo/values-test.yaml"
+    needs:
+      - monitoring/kube-prometheus-stack
+
+  - name: opentelemetry-operator
+    namespace: opentelemetry-operator-system
+    chart: open-telemetry/opentelemetry-operator
+    version: 0.90.4
+    createNamespace: true
+    needs:
+      - cert-manager/cert-manager
+
+  - name: opentelemetry-collector
+    namespace: monitoring
+    chart: open-telemetry/opentelemetry-collector
+    version: 0.126.0
+    values:
+      - "../opentelemetry/collector/values-test.yaml"
+    needs:
+      - opentelemetry-operator-system/opentelemetry-operator
+      - monitoring/loki
+      - monitoring/tempo

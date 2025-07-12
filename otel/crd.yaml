@@ -9,6 +9,7 @@ spec:
   propagators:
     - tracecontext
     - baggage
+    - b3
   sampler:
     type: parentbased_traceidratio
     argument: "1"
@@ -19,7 +20,7 @@ spec:
       - name: OTEL_EXPORTER_OTLP_PROTOCOL
         value: grpc
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://signoz-otel-collector.metric.svc.cluster.local:4317
+        value: http://opentelemetry-collector.monitoring.svc.cluster.local:4317
       - name: OTEL_METRICS_EXPORTER
         value: prometheus
       - name: OTEL_METRICS_EXEMPLAR_FILTER
@@ -28,4 +29,4 @@ spec:
       - name: OTEL_LOGS_EXPORTER
         value: otlp
       - name: OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
-        value: http://signoz-otel-collector.metric.svc.cluster.local:4317
+        value: http://opentelemetry-collector.monitoring.svc.cluster.local:4317

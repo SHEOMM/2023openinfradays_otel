@@ -1,0 +1,65 @@
+grafana:
+  enabled: false
+
+distributor:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+ingester:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  chunk_idle_period: 30m
+  chunk_target_size: 1MB
+  max_chunk_age: 30m
+
+querier:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+compactor:
+  enabled: false
+
+loki:
+  limits_config:
+    allow_structured_metadata: true
+    retention_period: 7d
+
+    ingestion_rate_mb: 5
+    ingestion_burst_size_mb: 10
+
+    max_entries_limit_per_query: 5000
+    max_cache_freshness_per_query: 10m
+
+    max_query_length: 168h
+    max_query_parallelism: 16
+
+    max_streams_per_user: 1000
+    max_line_size: 128KB
+
+    reject_old_samples: true
+    reject_old_samples_max_age: 24h
+  storage:
+    type: 'filesystem'
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
