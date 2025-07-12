@@ -1,8 +1,71 @@
+# 명시적으로 SingleBinary 모드 설정
+deploymentMode: SingleBinary
+
+singleBinary:
+  enabled: true
+  replicas: 1
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# SimpleScalable 모드 컴포넌트들을 명시적으로 비활성화
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+
+# 기존 scalable 컴포넌트들도 명시적으로 비활성화
+distributor:
+  replicas: 0
+ingester:
+  replicas: 0
+querier:
+  replicas: 0
+queryFrontend:
+  replicas: 0
+queryScheduler:
+  replicas: 0
+compactor:
+  replicas: 0
+indexGateway:
+  replicas: 0
+ruler:
+  replicas: 0
+
 loki:
+  auth_enabled: false
+  useTestSchema: true
   commonConfig:
     replication_factor: 1
   storage:
-    type: 'filesystem'
-  auth_enabled: false
-singleBinary:
-  replicas: 1
+    type: filesystem
+  storage_config:
+    filesystem:
+      directory: /tmp/loki
+
+# 모든 모니터링 컴포넌트 비활성화
+test:
+  enabled: false
+monitoring:
+  dashboards:
+    enabled: false
+  rules:
+    enabled: false
+  alerts:
+    enabled: false
+  serviceMonitor:
+    enabled: false
+selfMonitoring:
+  enabled: false
+lokiCanary:
+  enabled: false
+grafanaAgent:
+  installOperator: false
