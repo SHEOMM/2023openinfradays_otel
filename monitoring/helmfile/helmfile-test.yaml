@@ -20,7 +20,11 @@ releases:
         value: standalone
       - name: replicas
         value: 1
-
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    chart: prometheus-community/kube-prometheus-stack
+    version: 56.5.0
+    createNamespace: true
   - name: loki
     namespace: monitoring
     createNamespace: true
@@ -55,3 +59,52 @@ releases:
       - opentelemetry-operator-system/opentelemetry-operator
       - monitoring/loki
       - monitoring/tempo
+
+  - name: grafana
+    namespace: monitoring
+    chart: grafana/grafana
+    version: 8.3.4
+    createNamespace: true
+    needs:
+      - monitoring/kube-prometheus-stack
+      - monitoring/loki
+      - monitoring/tempo
+    values:
+      - |
+        adminPassword: "admin"
+        service:
+          type: LoadBalancer
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+              - name: Prometheus
+                type: prometheus
+                uid: prometheus
+                url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+                isDefault: true
+              - name: Loki
+                type: loki
+                uid: loki
+                url: http://loki-gateway.monitoring.svc.cluster.local
+              - name: Tempo
+                type: tempo
+                uid: tempo
+                url: http://tempo.monitoring.svc.cluster.local:3200
+        dashboardProviders:
+          dashboardproviders.yaml:
+            apiVersion: 1
+            providers:
+              - name: 'default'
+                orgId: 1
+                folder: ''
+                type: file
+                disableDeletion: false
+                editable: true
+                options:
+                  path: /var/lib/grafana/dashboards/default
+        dashboards:
+          default:
+            apm-dashboard:
+              json: |
+                {{ .Files.Get "grafana/dashboard.json" | nindent 16 }}
