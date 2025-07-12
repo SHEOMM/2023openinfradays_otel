@@ -1,7 +1,5 @@
-# 최종 values.yaml for Minikube with MinIO
+# 최종 values.yaml for Minikube with MinIO (수정본)
 
-# 마이크로서비스 모드로 배포
-# deploymentMode를 명시하지 않으면 기본적으로 이 모드로 동작합니다.
 grafana:
   enabled: false
 
@@ -58,21 +56,21 @@ loki:
 
   storage:
     type: 's3'
+    # bucket name은 필수
+    bucketNames:
+      chunks: "loki-chunks"
+      ruler: "loki-ruler"
+      admin: "loki-admin"
     s3:
-      # MinIO의 클러스터 내부 주소. http://<서비스이름>.<네임스페이스>.svc.cluster.local:9000
       endpoint: "http://minio.minio.svc.cluster.local:9000"
-      # insecure: true는 http 엔드포인트 사용 시 필요합니다.
       insecure: true
-      # accessKeyId와 secretAccessKey는 MinIO 설치 시 설정한 값입니다.
       accessKeyId: "minioadmin"
       secretAccessKey: "minioadmin123"
-      # s3ForcePathStyle: true는 MinIO와 같은 S3 호환 스토리지에 필수적인 설정입니다.
       s3ForcePathStyle: true
-      # bucketNames는 Loki가 자동으로 생성하므로 명시하지 않아도 됩니다.
 
   serviceAccount:
     create: true
-    annotations: {} # 비워둡니다.
+    annotations: {}
 
 serviceMonitor:
   enabled: true
