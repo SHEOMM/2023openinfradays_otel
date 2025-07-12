@@ -1,19 +1,14 @@
+
 prometheus:
   enabled: false
 alertmanager:
   enabled: false
 grafana:
   enabled: false
-kube-state-metrics:
-  enabled: false
-prometheus-node-exporter:
-  enabled: false
 
-# 2. PrometheusRule 리소스 생성 비활성화 (이전 단계에서 추가)
 defaultRules:
   create: false
 
-# 3. 모든 기본 ServiceMonitor 생성 비활성화 (이번 해결의 핵심)
 coreDns:
   enabled: false
 kubelet:
@@ -28,3 +23,20 @@ kubeScheduler:
   enabled: false
 kubeProxy:
   enabled: false
+
+
+kube-state-metrics:
+  enabled: false
+  prometheus:
+    monitor:
+      enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+  prometheus:
+    monitor:
+      enabled: false
+
+prometheusOperator:
+  serviceMonitor:
+    enabled: false
