@@ -1,0 +1,14 @@
+# spring-server를 위한 서비스 매니페스트
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-server # 이 이름으로 클러스터 내에서 DNS 조회가 가능해집니다.
+  namespace: server
+spec:
+  ports:
+    - protocol: TCP
+      port: 8081       # 서비스가 노출할 포트
+      targetPort: 8081 # spring-server 파드의 컨테이너 포트
+  # 'app=spring-server' 레이블을 가진 파드를 이 서비스와 연결합니다.
+  selector:
+    app: spring-server
