@@ -39,6 +39,9 @@ compactor:
   enabled: false
 
 loki:
+  storage_config:
+    filesystem:
+      directory: /data/loki
   limits_config:
     allow_structured_metadata: true
     retention_period: 7d
@@ -57,9 +60,15 @@ loki:
 
     reject_old_samples: true
     reject_old_samples_max_age: 24h
+
+singleBinary:
+  enabled: false
   storage:
     type: 'filesystem'
-
+persistence:
+  enabled: true
+  storageClassName: standard # Minikube의 기본 스토리지 클래스
+  size: 1Gi
 serviceMonitor:
   enabled: true
   interval: 30s
