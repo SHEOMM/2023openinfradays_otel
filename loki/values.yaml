@@ -1,5 +1,3 @@
-# loki/values-test.yaml
-
 deploymentMode: SingleBinary
 
 singleBinary:
@@ -7,88 +5,7 @@ singleBinary:
   replicas: 1
   persistence:
     enabled: false
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
-
-# 모든 scalable 컴포넌트 비활성화
-backend:
-  replicas: 0
-read:
-  replicas: 0
-write:
-  replicas: 0
-distributor:
-  replicas: 0
-ingester:
-  replicas: 0
-querier:
-  replicas: 0
-queryFrontend:
-  replicas: 0
-queryScheduler:
-  replicas: 0
-compactor:
-  replicas: 0
-indexGateway:
-  replicas: 0
-ruler:
-  replicas: 0
 
 loki:
   auth_enabled: false
   useTestSchema: true
-  commonConfig:
-    replication_factor: 1
-    path_prefix: /tmp/loki
-  storage:
-    type: filesystem
-  storage_config:
-    filesystem:
-      directory: /tmp/loki/chunks
-  # ruler 설정 - WAL 디렉터리 포함
-  ruler:
-    enable_api: false
-    enable_sharding: false
-    storage:
-      type: local
-      local:
-        directory: /tmp/loki/rules
-    wal:
-      dir: /tmp/loki/ruler-wal  # WAL 디렉터리를 /tmp로 변경
-  limits_config:
-    allow_structured_metadata: true
-    retention_period: 7d
-    ingestion_rate_mb: 5
-    ingestion_burst_size_mb: 10
-    max_entries_limit_per_query: 5000
-    max_cache_freshness_per_query: 10m
-    max_query_length: 168h
-    max_query_parallelism: 16
-    max_streams_per_user: 1000
-    max_line_size: 128KB
-    reject_old_samples: true
-    reject_old_samples_max_age: 24h
-
-# 모니터링 컴포넌트 비활성화
-test:
-  enabled: false
-monitoring:
-  dashboards:
-    enabled: false
-  rules:
-    enabled: false
-  alerts:
-    enabled: false
-  serviceMonitor:
-    enabled: false
-selfMonitoring:
-  enabled: false
-lokiCanary:
-  enabled: false
-grafanaAgent:
-  installOperator: false
