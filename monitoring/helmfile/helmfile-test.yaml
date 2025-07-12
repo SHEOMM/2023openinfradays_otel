@@ -20,13 +20,12 @@ releases:
         value: standalone
       - name: replicas
         value: 1
-  # ▼▼▼▼▼ 1단계: Prometheus CRD만 설치하는 릴리스 ▼▼▼▼▼
+  # ▼▼▼▼▼ 1단계: Prometheus CRD만 설치하는 릴리스 (수정됨) ▼▼▼▼▼
   - name: kube-prometheus-stack-crds
     namespace: monitoring
     chart: prometheus-community/kube-prometheus-stack
     version: 56.5.0
     createNamespace: true
-    # CRD를 제외한 모든 구성 요소를 비활성화합니다.
     values:
       - alertmanager:
           enabled: false
@@ -36,22 +35,32 @@ releases:
           enabled: false
       - prometheus-node-exporter:
           enabled: false
-      - prometheus:
-          enabled: false
       - prometheusOperator:
           enabled: false
+      - prometheus:
+          enabled: false
+      # ▼▼▼▼▼ 이 설정이 핵심입니다 ▼▼▼▼▼
+      - defaultRules:
+          create: false # PrometheusRule 리소스 생성을 비활성화
+      - kubeEtcd:
+          enabled: false
+      - kubeControllerManager:
+          enabled: false
+      - kubeScheduler:
+          enabled: false
+      - kubeProxy:
+          enabled: false
 
-  # ▼▼▼▼▼ 2단계: CRD 설치 후 나머지 Prometheus 스택 설치 ▼▼▼▼▼
+  # ▼▼▼▼▼ 2단계: 나머지 Prometheus 스택 설치 (수정됨) ▼▼▼▼▼
   - name: kube-prometheus-stack
     namespace: monitoring
     chart: prometheus-community/kube-prometheus-stack
     version: 56.5.0
-    createNamespace: true # 네임스페이스가 이미 있을 수 있지만, 안전을 위해 유지
-    # CRD는 위에서 이미 설치했으므로 여기서는 설치하지 않도록 설정합니다.
+    createNamespace: true
+    # 위에서 만든 values 파일을 사용합니다.
     values:
-      - prometheusOperator:
-          installCRDs: false
-    # 반드시 '-crds' 릴리스가 끝난 후에 실행되도록 의존성을 설정합니다.
+      - "../prometheus/values-test.yaml"
+    # CRD 설치 릴리스가 끝난 후에 실행되도록 의존성을 설정합니다.
     needs:
       - monitoring/kube-prometheus-stack-crds
   - name: loki
