@@ -1,30 +1,63 @@
+# loki/values-test.yaml
+deploymentMode: SingleBinary
+
+singleBinary:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 loki:
-  # 모든 설정을 loki 키 아래에 통합합니다.
-
-  # 단일 모드 활성화
-  singleBinary:
-    enabled: true
-
-  # PV 비활성화
-  persistence:
-    enabled: false
-
-  # 스토리지 설정
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
   storage:
-    type: 'filesystem'
+    type: filesystem
+  storage_config:
+    filesystem:
+      directory: /data/loki
+  limits_config:
+    allow_structured_metadata: true
+    retention_period: 7d
+    ingestion_rate_mb: 5
+    ingestion_burst_size_mb: 10
+    max_entries_limit_per_query: 5000
+    max_cache_freshness_per_query: 10m
+    max_query_length: 168h
+    max_query_parallelism: 16
+    max_streams_per_user: 1000
+    max_line_size: 128KB
+    reject_old_samples: true
+    reject_old_samples_max_age: 24h
 
-  # 분산 모드 컴포넌트 비활성화
-  distributor:
-    enabled: false
-  ingester:
-    enabled: false
-  querier:
-    enabled: false
+# 개별 컴포넌트 설정 제거
+# distributor, ingester, querier 설정은 singleBinary 모드에서 불필요
 
-  # 기타 비활성화 컴포넌트
-  compactor:
-    enabled: false
+persistence:
+  enabled: true
+  storageClassName: standard
+  size: 1Gi
 
-# 이 차트의 Grafana는 사용하지 않음
-grafana:
+# 모니터링 컴포넌트 비활성화
+test:
   enabled: false
+monitoring:
+  dashboards:
+    enabled: false
+  rules:
+    enabled: false
+  alerts:
+    enabled: false
+  serviceMonitor:
+    enabled: false
+selfMonitoring:
+  enabled: false
+lokiCanary:
+  enabled: false
+grafanaAgent:
+  installOperator: false
