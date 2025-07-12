@@ -25,6 +25,9 @@ releases:
     chart: prometheus-community/kube-prometheus-stack
     version: 56.5.0
     createNamespace: true
+    set:
+      - name: prometheus-operator.installCRDs
+        value: true
   - name: loki
     namespace: monitoring
     createNamespace: true
