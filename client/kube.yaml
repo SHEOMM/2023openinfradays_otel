@@ -34,7 +34,7 @@ spec:
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: "service.name=spring-client,service.version=1.0.0,deployment.environment=development"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://signoz-otel-collector.metric.svc.cluster.local:4317"
+              value: "http://opentelemetry-collector.monitoring.svc.cluster.local:4317"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
             - name: OTEL_TRACES_EXPORTER
