@@ -7,7 +7,7 @@ grafana:
 # Simple Scalable 모드에서 사용할 컴포넌트들
 backend:
   enabled: true
-  replicas: 1
+  replicas: 2
   resources:
     requests:
       cpu: 100m
@@ -18,7 +18,7 @@ backend:
 
 read:
   enabled: true
-  replicas: 1
+  replicas: 2
   resources:
     requests:
       cpu: 50m
@@ -29,7 +29,7 @@ read:
 
 write:
   enabled: true
-  replicas: 1
+  replicas: 2
   resources:
     requests:
       cpu: 50m
