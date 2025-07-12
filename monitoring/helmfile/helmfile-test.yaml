@@ -7,7 +7,15 @@ releases:
     set:
       - name: installCRDs
         value: true
-
+  - name: minio
+    namespace: minio
+    chart: minio/minio
+    createNamespace: true
+    set:
+      - name: rootUser
+        value: minioadmin
+      - name: rootPassword
+        value: minioadmin123
   - name: loki
     namespace: monitoring
     createNamespace: true
@@ -15,6 +23,8 @@ releases:
     version: 6.30.1
     values:
       - "../loki/values-test.yaml"
+    needs:
+      - minio/minio
   - name: tempo
     namespace: monitoring
     chart: grafana/tempo
