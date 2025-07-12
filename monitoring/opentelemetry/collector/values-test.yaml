@@ -51,9 +51,6 @@ config:
         explicit:
           buckets: [0.5, 0.75, 1, 2.5, 5, 10]
       dimensions:
-        - name: span.name
-        - name: span.kind
-        - name: status.code
         - name: k8s.namespace.name
         - name: k8s.deployment.name
       metrics_flush_interval: 15s
