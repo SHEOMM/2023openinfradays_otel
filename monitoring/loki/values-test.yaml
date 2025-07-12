@@ -70,6 +70,3 @@ persistence:
   enabled: true
   storageClassName: standard # Minikube의 기본 스토리지 클래스
   size: 1Gi
-serviceMonitor:
-  enabled: true
-  interval: 30s
