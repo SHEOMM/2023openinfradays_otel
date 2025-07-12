@@ -20,49 +20,13 @@ releases:
         value: standalone
       - name: replicas
         value: 1
-  # ▼▼▼▼▼ 1단계: Prometheus CRD만 설치하는 릴리스 (수정됨) ▼▼▼▼▼
-  - name: kube-prometheus-stack-crds
+  - name: prometheus
     namespace: monitoring
-    chart: prometheus-community/kube-prometheus-stack
-    version: 56.5.0
+    chart: prometheus-community/prometheus
+    version: 25.8.0  # 최신 버전 사용 (필요시 조정)
     createNamespace: true
-    values:
-      - alertmanager:
-          enabled: false
-      - grafana:
-          enabled: false
-      - kube-state-metrics:
-          enabled: false
-      - prometheus-node-exporter:
-          enabled: false
-      - prometheusOperator:
-          enabled: false
-      - prometheus:
-          enabled: false
-      # ▼▼▼▼▼ 이 설정이 핵심입니다 ▼▼▼▼▼
-      - defaultRules:
-          create: false # PrometheusRule 리소스 생성을 비활성화
-      - kubeEtcd:
-          enabled: false
-      - kubeControllerManager:
-          enabled: false
-      - kubeScheduler:
-          enabled: false
-      - kubeProxy:
-          enabled: false
-
-  # ▼▼▼▼▼ 2단계: 나머지 Prometheus 스택 설치 (수정됨) ▼▼▼▼▼
-  - name: kube-prometheus-stack
-    namespace: monitoring
-    chart: prometheus-community/kube-prometheus-stack
-    version: 56.5.0
-    createNamespace: true
-    # 위에서 만든 values 파일을 사용합니다.
     values:
       - "../prometheus/values-test.yaml"
-    # CRD 설치 릴리스가 끝난 후에 실행되도록 의존성을 설정합니다.
-    needs:
-      - monitoring/kube-prometheus-stack-crds
   - name: loki
     namespace: monitoring
     createNamespace: true
@@ -104,7 +68,7 @@ releases:
     version: 8.3.4
     createNamespace: true
     needs:
-      - monitoring/kube-prometheus-stack
+      - monitoring/prometheus
       - monitoring/loki
       - monitoring/tempo
     values:
