@@ -1,8 +1,9 @@
-# values-test.yaml (수정 최종본)
+# values-test.yaml (최종 수정본)
 
+# 1. 배포 모드 설정
 deploymentMode: SingleBinary
 
-# SingleBinary 모드 활성화
+# 2. SingleBinary 모드 활성화
 singleBinary:
   enabled: true
   replicas: 1
@@ -17,30 +18,12 @@ singleBinary:
       memory: 512Mi
 
 # ===================================================================
-# ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 이 부분이 추가되었습니다 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+# ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 모든 다른 컴포넌트 비활성화 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 # ===================================================================
-# 마이크로서비스 모드 컴포넌트들을 명시적으로 비활성화(replicas: 0)합니다.
-ingester:
-  replicas: 0
-distributor:
-  replicas: 0
-querier:
-  replicas: 0
-queryFrontend:
-  replicas: 0
-queryScheduler:
-  replicas: 0
-compactor:
-  replicas: 0
-# ===================================================================
-# ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-# ===================================================================
-
-# gateway는 이미 비활성화 되어 있었지만, 명확성을 위해 유지합니다.
-gateway:
-  enabled: false
-
+# 각 컴포넌트를 enabled: false 로 명확하게 비활성화합니다.
 loki:
+  # 이 loki 블록은 singleBinary 모드의 설정을 위한 것입니다.
+  # storage_config, ruler 등은 여기에 유지합니다.
   auth_enabled: false
   commonConfig:
     replication_factor: 1
@@ -64,7 +47,35 @@ loki:
     ingestion_burst_size_mb: 10
     max_entries_limit_per_query: 5000
 
-# 모니터링 컴포넌트 비활성화
+# 아래는 모두 마이크로서비스(simple scalable) 모드용 컴포넌트입니다.
+# enabled: false로 설정하여 완전히 비활성화합니다.
+write:
+  enabled: false
+read:
+  enabled: false
+backend:
+  enabled: false
+
+ingester:
+  enabled: false
+distributor:
+  enabled: false
+querier:
+  enabled: false
+queryFrontend:
+  enabled: false
+queryScheduler:
+  enabled: false
+compactor:
+  enabled: false
+gateway:
+  enabled: false
+
+# ===================================================================
+# ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+# ===================================================================
+
+# 모니터링 관련 부가 기능 비활성화
 test:
   enabled: false
 monitoring:
