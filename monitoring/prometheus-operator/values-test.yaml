@@ -1,4 +1,3 @@
-# Prometheus 서버 비활성화 (가장 중요)
 prometheus:
   enabled: false
 
@@ -15,3 +14,7 @@ kube-state-metrics:
   enabled: false
 prometheus-node-exporter:
   enabled: false
+
+# PrometheusRule 리소스 생성을 막는 핵심 설정
+defaultRules:
+  create: false
