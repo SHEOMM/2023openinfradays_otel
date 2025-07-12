@@ -59,10 +59,7 @@ compactor:
   enabled: false
 
 caching:
-  memcached_chunks:
-    enabled: false
-  memcached_results:
-    enabled: false
+  enabled: false
 
 loki:
   useTestSchema: true
