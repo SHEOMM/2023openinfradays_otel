@@ -9,10 +9,16 @@ grafana:
 # ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 충돌을 일으키는 scalable 모드 컴포넌트 비활성화 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 backend:
   enabled: false
+  replicas: 0
+
 read:
   enabled: false
+  replicas: 0
+
 write:
   enabled: false
+  replicas: 0
+
 # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 # 'distributed' 모드에서 사용할 컴포넌트들
