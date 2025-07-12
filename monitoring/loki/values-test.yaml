@@ -1,39 +1,11 @@
-# 최종 values.yaml for Minikube with MinIO (2차 수정본)
-
-# deploymentMode를 명시적으로 'distributed'로 설정합니다.
-deploymentMode: distributed
+# 최종 values.yaml for Minikube with MinIO (Simple Scalable 모드)
+deploymentMode: SimpleScalable
 
 grafana:
   enabled: false
 
-# ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 충돌을 일으키는 scalable 모드 컴포넌트 비활성화 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+# Simple Scalable 모드에서 사용할 컴포넌트들
 backend:
-  enabled: false
-  replicas: 0
-
-read:
-  enabled: false
-  replicas: 0
-
-write:
-  enabled: false
-  replicas: 0
-
-# ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
-# 'distributed' 모드에서 사용할 컴포넌트들
-distributor:
-  enabled: true
-  replicas: 1
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 100m
-      memory: 256Mi
-
-ingester:
   enabled: true
   replicas: 1
   resources:
@@ -43,11 +15,8 @@ ingester:
     limits:
       cpu: 500m
       memory: 512Mi
-  chunk_idle_period: 30m
-  chunk_target_size: 1MB
-  max_chunk_age: 30m
 
-querier:
+read:
   enabled: true
   replicas: 1
   resources:
@@ -58,12 +27,42 @@ querier:
       cpu: 100m
       memory: 256Mi
 
+write:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+# Distributed 모드 컴포넌트들 비활성화
+distributor:
+  enabled: false
+  replicas: 0
+
+ingester:
+  enabled: false
+  replicas: 0
+
+querier:
+  enabled: false
+  replicas: 0
+
+queryFrontend:
+  enabled: false
+  replicas: 0
+
 compactor:
   enabled: false
 
-queryFrontend:
-  enabled: true
-  replicas: 1
+caching:
+  memcached_chunks:
+    enabled: false
+  memcached_results:
+    enabled: false
 
 loki:
   useTestSchema: true
