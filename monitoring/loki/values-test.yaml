@@ -44,13 +44,13 @@ loki:
   useTestSchema: true
   commonConfig:
     replication_factor: 1
-    path_prefix: /tmp/loki  # 모든 경로의 기본 prefix
+    path_prefix: /tmp/loki
   storage:
     type: filesystem
   storage_config:
     filesystem:
       directory: /tmp/loki/chunks
-  # ruler storage 경로를 명시적으로 설정
+  # ruler 설정 - WAL 디렉터리 포함
   ruler:
     enable_api: false
     enable_sharding: false
@@ -58,6 +58,8 @@ loki:
       type: local
       local:
         directory: /tmp/loki/rules
+    wal:
+      dir: /tmp/loki/ruler-wal  # WAL 디렉터리를 /tmp로 변경
   limits_config:
     allow_structured_metadata: true
     retention_period: 7d
