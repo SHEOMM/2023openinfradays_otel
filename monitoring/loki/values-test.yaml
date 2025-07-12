@@ -1,39 +1,30 @@
-singleBinary:
-  enabled: true
-
-# PV를 사용하지 않으므로 비활성화
-persistence:
-  enabled: false
-
-# Loki 기본 설정
 loki:
-  # 단일 모드에서는 여기서 파일 시스템 스토리지를 사용하도록 설정
+  # 모든 설정을 loki 키 아래에 통합합니다.
+
+  # 단일 모드 활성화
+  singleBinary:
+    enabled: true
+
+  # PV 비활성화
+  persistence:
+    enabled: false
+
+  # 스토리지 설정
   storage:
     type: 'filesystem'
-  limits_config:
-    allow_structured_metadata: true
-    retention_period: 7d
-    ingestion_rate_mb: 5
-    ingestion_burst_size_mb: 10
-    max_entries_limit_per_query: 5000
-    max_cache_freshness_per_query: 10m
-    max_query_length: 168h
-    max_query_parallelism: 16
-    max_streams_per_user: 1000
-    max_line_size: 128KB
-    reject_old_samples: true
-    reject_old_samples_max_age: 24h
 
-# 분산 모드 컴포넌트 비활성화
-distributor:
-  enabled: false
-ingester:
-  enabled: false
-querier:
-  enabled: false
+  # 분산 모드 컴포넌트 비활성화
+  distributor:
+    enabled: false
+  ingester:
+    enabled: false
+  querier:
+    enabled: false
 
-# 기타 비활성화 컴포넌트
+  # 기타 비활성화 컴포넌트
+  compactor:
+    enabled: false
+
+# 이 차트의 Grafana는 사용하지 않음
 grafana:
-  enabled: false
-compactor:
   enabled: false
