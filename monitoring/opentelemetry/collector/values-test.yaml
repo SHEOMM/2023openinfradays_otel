@@ -42,16 +42,19 @@ config:
           - k8s.namespace.name
           - k8s.container.name
           - k8s.deployment.name
-    spanmetrics:
-      metrics_exporter: prometheus
-      latency_histogram_buckets: [0.5, 0.75, 1, 2.5, 5, 10]
-      dimensions:
-        - service.name
-        - span.name
-        - span.kind
-        - status.code
-        - k8s.namespace.name
-        - k8s.deployment.name
+    connectors:
+      spanmetrics:
+        histogram:
+          explicit:
+            buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
+        dimensions:
+          - name: service.name
+          - name: span.name
+          - name: span.kind
+          - name: status.code
+          - name: k8s.namespace.name
+          - name: k8s.deployment.name
+        metrics_flush_interval: 15s
     transform/logs:
       log_statements:
         - context: resource
@@ -63,10 +66,10 @@ config:
             - set(body["message"], "Replaced by *** MASKED ***") where body["message"] matches "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
 
   exporters:
-    logging:
-      loglevel: info
-    prometheus:
-      endpoint: "0.0.0.0:8888"
+    debug:
+      verbosity: detailed
+      prometheus:
+        endpoint: "0.0.0.0:8888"
     loki:
       endpoint: "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
       labels:
