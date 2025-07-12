@@ -23,6 +23,7 @@ write:
 
 # 'distributed' 모드에서 사용할 컴포넌트들
 distributor:
+  enabled: true
   replicas: 1
   resources:
     requests:
@@ -33,6 +34,7 @@ distributor:
       memory: 256Mi
 
 ingester:
+  enabled: true
   replicas: 1
   resources:
     requests:
@@ -46,6 +48,7 @@ ingester:
   max_chunk_age: 30m
 
 querier:
+  enabled: true
   replicas: 1
   resources:
     requests:
@@ -57,6 +60,16 @@ querier:
 
 compactor:
   enabled: false
+
+queryFrontend:
+  enabled: true
+  replicas: 1
+
+caching:
+  memcached_chunks:
+    enabled: false
+  memcached_results:
+    enabled: false
 
 loki:
   useTestSchema: true
