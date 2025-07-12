@@ -52,6 +52,9 @@ loki:
   storage_config:
     filesystem:
       directory: /tmp/loki  # 임시 디렉터리 사용
+  ruler:
+    enable_api: false
+    enable_sharding: false
   limits_config:
     allow_structured_metadata: true
     retention_period: 7d
