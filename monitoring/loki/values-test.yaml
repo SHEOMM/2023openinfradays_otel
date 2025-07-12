@@ -1,13 +1,10 @@
-# values-test.yaml 수정 제안
+# values-test.yaml (수정 최종본)
 
-# 명시적으로 SingleBinary 모드 설정
 deploymentMode: SingleBinary
 
-# SingleBinary 모드 활성화 및 설정
 singleBinary:
   enabled: true
   replicas: 1
-  # 필요하다면 persistence 및 resources 설정 유지
   persistence:
     enabled: false
   resources:
@@ -18,33 +15,45 @@ singleBinary:
       cpu: 500m
       memory: 512Mi
 
-# gateway가 의도치 않게 생성되므로 명시적으로 비활성화
+# 의도치 않게 생성되는 gateway 명시적 비활성화
 gateway:
   enabled: false
 
-# SingleBinary 모드에서는 아래 컴포넌트들을 명시적으로 끌 필요가 없습니다.
-# deploymentMode 설정이 이를 자동으로 처리합니다.
-# backend, read, write, distributor, ingester 등의 replicas: 0 설정 모두 제거
-
 loki:
   auth_enabled: false
+  # 공통 경로 접두사를 /tmp/loki로 설정
   commonConfig:
     replication_factor: 1
+    path_prefix: /tmp/loki
+
+  # 스토리지 타입을 filesystem으로 지정
   storage:
     type: filesystem
-  # ... 나머지 loki 설정은 그대로 유지 ...
+
+  # 스토리지 상세 설정에서 디렉터리를 명시적으로 /tmp/loki 하위로 지정
+  storage_config:
+    filesystem:
+      directory: /tmp/loki/chunks
+
+  # ruler 설정에서 디렉터리 경로를 명시적으로 /tmp/loki 하위로 지정
   ruler:
-    # ruler API는 SingleBinary 모드에서 기본 비활성화되므로 이 설정이 문제를 일으킬 수 있습니다.
-    # 우선 주석 처리하거나 제거하는 것을 권장합니다.
-    # enable_api: false
     storage:
+      type: local
       local:
         directory: /tmp/loki/rules
-    # wal 설정 등 나머지 부분은 유지
     wal:
       dir: /tmp/loki/ruler-wal
 
-# 모니터링 컴포넌트 비활성화 설정은 그대로 유지
+  # limits_config 등 나머지 설정은 기존과 동일하게 유지
+  limits_config:
+    allow_structured_metadata: true
+    retention_period: 7d
+    ingestion_rate_mb: 5
+    ingestion_burst_size_mb: 10
+    max_entries_limit_per_query: 5000
+    # ... 기타 limits_config 설정 ...
+
+# 모니터링 컴포넌트 비활성화
 test:
   enabled: false
 monitoring:
