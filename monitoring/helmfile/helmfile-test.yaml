@@ -20,14 +20,40 @@ releases:
         value: standalone
       - name: replicas
         value: 1
-  - name: kube-prometheus-stack
+  # ▼▼▼▼▼ 1단계: Prometheus CRD만 설치하는 릴리스 ▼▼▼▼▼
+  - name: kube-prometheus-stack-crds
     namespace: monitoring
     chart: prometheus-community/kube-prometheus-stack
     version: 56.5.0
     createNamespace: true
-    set:
-      - name: prometheus-operator.installCRDs
-        value: true
+    # CRD를 제외한 모든 구성 요소를 비활성화합니다.
+    values:
+      - alertmanager:
+          enabled: false
+      - grafana:
+          enabled: false
+      - kube-state-metrics:
+          enabled: false
+      - prometheus-node-exporter:
+          enabled: false
+      - prometheus:
+          enabled: false
+      - prometheusOperator:
+          enabled: false
+
+  # ▼▼▼▼▼ 2단계: CRD 설치 후 나머지 Prometheus 스택 설치 ▼▼▼▼▼
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    chart: prometheus-community/kube-prometheus-stack
+    version: 56.5.0
+    createNamespace: true # 네임스페이스가 이미 있을 수 있지만, 안전을 위해 유지
+    # CRD는 위에서 이미 설치했으므로 여기서는 설치하지 않도록 설정합니다.
+    values:
+      - prometheusOperator:
+          installCRDs: false
+    # 반드시 '-crds' 릴리스가 끝난 후에 실행되도록 의존성을 설정합니다.
+    needs:
+      - monitoring/kube-prometheus-stack-crds
   - name: loki
     namespace: monitoring
     createNamespace: true
