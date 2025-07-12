@@ -1,20 +1,30 @@
 prometheus:
   enabled: false
-
-# Alertmanager 비활성화
 alertmanager:
   enabled: false
-
-# Grafana 비활성화
 grafana:
   enabled: false
-
-# 기타 메트릭 수집기 비활성화
 kube-state-metrics:
   enabled: false
 prometheus-node-exporter:
   enabled: false
 
-# PrometheusRule 리소스 생성을 막는 핵심 설정
+# 2. PrometheusRule 리소스 생성 비활성화 (이전 단계에서 추가)
 defaultRules:
   create: false
+
+# 3. 모든 기본 ServiceMonitor 생성 비활성화 (이번 해결의 핵심)
+coreDns:
+  enabled: false
+kubelet:
+  enabled: false
+kubeApiServer:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
