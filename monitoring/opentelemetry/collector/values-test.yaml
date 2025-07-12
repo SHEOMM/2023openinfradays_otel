@@ -1,4 +1,5 @@
 mode: deployment
+
 replicaCount: 1
 
 image:
@@ -42,19 +43,6 @@ config:
           - k8s.namespace.name
           - k8s.container.name
           - k8s.deployment.name
-    connectors:
-      spanmetrics:
-        histogram:
-          explicit:
-            buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
-        dimensions:
-          - name: service.name
-          - name: span.name
-          - name: span.kind
-          - name: status.code
-          - name: k8s.namespace.name
-          - name: k8s.deployment.name
-        metrics_flush_interval: 15s
     transform/logs:
       log_statements:
         - context: resource
@@ -65,31 +53,49 @@ config:
           statements:
             - set(body["message"], "Replaced by *** MASKED ***") where body["message"] matches "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
 
+  # connectors를 별도 섹션으로 분리
+  connectors:
+    spanmetrics:
+      histogram:
+        explicit:
+          buckets: [0.5, 0.75, 1, 2.5, 5, 10]
+      dimensions:
+        - name: service.name
+        - name: span.name
+        - name: span.kind
+        - name: status.code
+        - name: k8s.namespace.name
+        - name: k8s.deployment.name
+      metrics_flush_interval: 15s
+
   exporters:
     debug:
       verbosity: detailed
-      prometheus:
-        endpoint: "0.0.0.0:8888"
+    prometheus:
+      endpoint: "0.0.0.0:8888"
     loki:
       endpoint: "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
       labels:
         resource:
           k8s.deployment.name: "app"
           log_type: "log_type"
-    tempo:
+    # tempo exporter를 otlp로 변경
+    otlp/tempo:
       endpoint: "http://tempo-distributor.monitoring.svc.cluster.local:4318"
-  # TODO: 안정화되면 logging exporter 제거
+      tls:
+        insecure: true
+
   service:
     pipelines:
       traces:
         receivers: [otlp]
-        processors: [memory_limiter, k8sattributes, batch, spanmetrics]
-        exporters: [tempo, logging]
+        processors: [memory_limiter, k8sattributes, batch]
+        exporters: [otlp/tempo, spanmetrics, debug]  # spanmetrics를 connector로 사용
       logs:
         receivers: [otlp]
         processors: [memory_limiter, k8sattributes, transform/logs, batch]
-        exporters: [loki, logging]
+        exporters: [loki, debug]
       metrics:
-        receivers: [spanmetrics]
+        receivers: [spanmetrics]  # connector에서 메트릭 수신
         processors: [batch]
-        exporters: [prometheus, logging]
+        exporters: [prometheus, debug]
