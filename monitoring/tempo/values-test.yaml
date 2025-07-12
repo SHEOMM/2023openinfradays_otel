@@ -7,11 +7,6 @@ storage:
       path: /tmp/tempo/wal
     retention: 72h
 
-serviceAccount:
-  create: true
-  annotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::246082724546:role/test-tempo-s3-role"
-
 distributor:
   replicas: 1
   resources:
