@@ -27,7 +27,7 @@ releases:
     createNamespace: true
     values:
       - "../prometheus/values-test.yaml"
-  - name: loki-stack
+  - name: loki  # loki-stack → loki로 변경
     namespace: monitoring
     createNamespace: true
     chart: grafana/loki
@@ -59,7 +59,7 @@ releases:
       - "../opentelemetry/collector/values-test.yaml"
     needs:
       - opentelemetry-operator-system/opentelemetry-operator
-      - monitoring/loki-stack
+      - monitoring/loki
       - monitoring/tempo
 
   - name: grafana
@@ -69,7 +69,7 @@ releases:
     createNamespace: true
     needs:
       - monitoring/prometheus
-      - monitoring/loki-stack
+      - monitoring/loki
       - monitoring/tempo
     values:
       - "../grafana/values-test.yaml"
