@@ -7,9 +7,6 @@ image:
 autoscaling:
   enabled: false
 
-serviceMonitor:
-  enabled: true
-
 resources:
   requests:
     cpu: 100m

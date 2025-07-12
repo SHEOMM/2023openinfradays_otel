@@ -1,72 +1,39 @@
-distributor:
-  replicas: 1
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 100m
-      memory: 256Mi
+singleBinary:
+  enabled: true
 
-ingester:
-  replicas: 1
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
+# PV를 사용하지 않으므로 비활성화
+persistence:
+  enabled: false
 
-  chunk_idle_period: 30m
-  chunk_target_size: 1MB
-  max_chunk_age: 30m
-
-querier:
-  replicas: 1
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 100m
-      memory: 256Mi
-
+# Loki 기본 설정
 loki:
-  # 스토리지 타입을 명시적으로 지정
+  # 단일 모드에서는 여기서 파일 시스템 스토리지를 사용하도록 설정
   storage:
-    type: filesystem
-  storage_config:
-    filesystem:
-      directory: /data/loki
+    type: 'filesystem'
   limits_config:
     allow_structured_metadata: true
     retention_period: 7d
-
     ingestion_rate_mb: 5
     ingestion_burst_size_mb: 10
-
     max_entries_limit_per_query: 5000
     max_cache_freshness_per_query: 10m
-
     max_query_length: 168h
     max_query_parallelism: 16
-
     max_streams_per_user: 1000
     max_line_size: 128KB
-
     reject_old_samples: true
     reject_old_samples_max_age: 24h
-# 비활성화할 컴포넌트
+
+# 분산 모드 컴포넌트 비활성화
+distributor:
+  enabled: false
+ingester:
+  enabled: false
+querier:
+  enabled: false
+
+# 기타 비활성화 컴포넌트
 grafana:
   enabled: false
 compactor:
   enabled: false
-singleBinary:
-  enabled: false
-  storage:
-    type: 'filesystem'
-persistence:
-  enabled: true
-  storageClassName: standard # Minikube의 기본 스토리지 클래스
-  size: 1Gi
