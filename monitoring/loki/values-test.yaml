@@ -43,24 +43,24 @@ write:
       memory: 256Mi
 
 # Distributed 모드 컴포넌트들 비활성화
-distributor:
-  enabled: false
-  replicas: 0
-
-ingester:
-  enabled: false
-  replicas: 0
-
-querier:
-  enabled: false
-  replicas: 0
-
-queryFrontend:
-  enabled: false
-  replicas: 0
-
-compactor:
-  enabled: false
+#distributor:
+#  enabled: false
+#  replicas: 0
+#
+#ingester:
+#  enabled: false
+#  replicas: 0
+#
+#querier:
+#  enabled: false
+#  replicas: 0
+#
+#queryFrontend:
+#  enabled: false
+#  replicas: 0
+#
+#compactor:
+#  enabled: false
 
 # ==================== 변경된 부분 시작 ====================
 # SimpleScalable 모드에서 기본으로 활성화되는 memcached 캐시의 리소스를 최소화합니다.
