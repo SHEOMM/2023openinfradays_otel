@@ -44,6 +44,8 @@
 - [promtail](https://grafana.com/docs/loki/latest/clients/promtail/installation/)
 - [tempo](https://grafana.com/docs/tempo/latest/setup/helm-chart/)
 
+
+
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add grafana https://grafana.github.io/helm-charts
@@ -55,6 +57,17 @@ helm upgrade -i  -f loki/values.yaml loki grafana/loki -n metric
 helm upgrade -i  promtail grafana/promtail -n metric
 helm upgrade -i  -f tempo/values.yaml tempo grafana/tempo -n metric
 
+```
+
+```bash
+helmfile apply -l name=cert-manager
+helmfile apply -l name=minio
+helmfile apply -l name=prometheus
+helmfile apply -l name=tempo
+helmfile apply -l name=loki
+helmfile apply -l name=opentelemetry-operator
+helmfile apply -l name=grafana
+helmfile apply -l name=opentelemetry-collector
 ```
 > prometheus : cpu, memory 데이터 수집 + server_http_duration_bucket 과 exemplars 로 지연 api 확인 **metric 저장소**   
 > promtail + loki : promtail이 로그를 수집(logstash 또는 fluentd 대체 가능), loki에 저장(elasticsearch 등 대체 가능) **log 저장소**   
@@ -80,11 +93,13 @@ helm upgrade -i  -f tempo/values.yaml tempo grafana/tempo -n metric
 ```bash 
 # client application 배포
 cd client
-sudo ./gradlew jibDockerBuild
+eval $(minikube docker-env) # minikube docker 환경으로 설정
+./gradlew jibDockerBuild
 kubectl apply -f ./kube.yaml
 
 # server app 배포 전 opentelemetry autoinstrumentation을 위한 환경 셋팅
 cd ..
+
 kubectl create namespace otel
 helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
 helm upgrade -i opentelemetry-operator open-telemetry/opentelemetry-operator -n otel --set admissionWebhooks.certManager.enabled=false --set admissionWebhooks.autoGenerateCert=true --wait
@@ -92,7 +107,8 @@ kubectl apply -f otel/crd.yaml
 
 # server application 배포
 cd server
-sudo ./gradlew jibDockerBuild
+eval $(minikube docker-env)
+./gradlew jibDockerBuild
 kubectl apply -f ./kube.yaml
 ```
 
