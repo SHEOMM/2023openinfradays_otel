@@ -8,6 +8,10 @@ grafana:
 backend:
   enabled: true
   replicas: 1
+  securityContext:
+    fsGroup: 10001
+    runAsUser: 10001
+    runAsGroup: 10001
   resources:
     requests:
       cpu: 100m
@@ -66,8 +70,11 @@ chunksCache:
 
 
 loki:
+  commonConfig:
+    replication_factor: 1
   useTestSchema: true
   limits_config:
+    replication_factor: 1
     allow_structured_metadata: true
     retention_period: 7d
     ingestion_rate_mb: 5
