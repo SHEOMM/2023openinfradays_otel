@@ -58,8 +58,16 @@ queryFrontend:
 compactor:
   enabled: false
 
+## 캐싱 비활성화?
 caching:
   enabled: false
+
+chunks-cache:
+  enabled: false
+
+results-cache:
+  enabled: false
+
 
 loki:
   useTestSchema: true
