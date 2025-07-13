@@ -67,9 +67,6 @@ loki:
 backend:
   enabled: true
   replicas: 1
-  persistence:
-    enabled: true
-    size: 10Gi
   securityContext:
     fsGroup: 10001
     runAsUser: 10001
@@ -89,9 +86,6 @@ read:
 write:
   enabled: true
   replicas: 1
-  persistence:
-    enabled: true
-    size: 10Gi
   securityContext:
     fsGroup: 10001
     runAsUser: 10001
