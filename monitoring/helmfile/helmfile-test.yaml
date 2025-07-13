@@ -33,7 +33,7 @@ releases:
     chart: grafana/loki
     version: 6.29.0
     values:
-      - "../loki/values-test2.yaml"
+      - "../loki/values-test.yaml"
     needs:
       - minio/minio
   - name: tempo

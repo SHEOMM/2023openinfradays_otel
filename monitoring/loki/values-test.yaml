@@ -70,11 +70,14 @@ chunksCache:
 
 
 loki:
-  commonConfig:
-    replication_factor: 1
+  distributor:
+    ring:
+      replication_factor: 1
+    ingester:
+      ring:
+        replication_factor: 1
   useTestSchema: true
   limits_config:
-    replication_factor: 1
     allow_structured_metadata: true
     retention_period: 7d
     ingestion_rate_mb: 5
