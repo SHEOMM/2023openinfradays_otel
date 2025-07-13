@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-client  # port-forward에서 사용할 이름
+  namespace: server
+spec:
+  selector:
+    app: spring-client  # 이 레이블을 가진 파드들을 찾아서 연결합니다.
+  ports:
+    - protocol: TCP
+      port: 8080        # 서비스가 노출할 포트
+      targetPort: 8080  # 파드의 컨테이너가 실제로 열고 있는 포트
