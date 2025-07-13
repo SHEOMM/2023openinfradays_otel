@@ -60,28 +60,8 @@ compactor:
 
 # ==================== 변경된 부분 시작 ====================
 # SimpleScalable 모드에서 기본으로 활성화되는 memcached 캐시의 리소스를 최소화합니다.
-memcachedChunks:
-  enabled: true
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
-
-memcachedResults:
-  enabled: true
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
-
-caching:
-  enabled: false
+chunksCache:
+    enabled: false
 # ==================== 변경된 부분 끝 ====================
 
 
