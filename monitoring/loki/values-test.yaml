@@ -82,7 +82,6 @@ loki:
         index:
           prefix: loki_index_
           period: 24h
-  useTestSchema: true
   limits_config:
     allow_structured_metadata: true
     retention_period: 7d
