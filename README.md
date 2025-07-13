@@ -60,6 +60,7 @@ helm upgrade -i  -f tempo/values.yaml tempo grafana/tempo -n metric
 ```
 
 ```bash
+minikube start --cpus=4 --memory=8192
 helmfile apply -l name=cert-manager
 helmfile apply -l name=minio
 helmfile apply -l name=prometheus
