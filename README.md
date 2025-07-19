@@ -113,6 +113,12 @@ eval $(minikube docker-env)
 kubectl apply -f ./kube.yaml
 ```
 
+server_simple 배포 방법
+
+```bash
+
+```
+
 ### 04. application test
 
 ```bash

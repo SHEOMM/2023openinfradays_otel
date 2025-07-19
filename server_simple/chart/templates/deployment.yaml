@@ -1,6 +1,5 @@
-name: spring-server
-version: 1.0.0
-apiVersion: v1
+# chart/templates/deployment.yaml
+apiVersion: apps/v1  # v1이 아닌 apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.app.name }}
@@ -28,4 +27,3 @@ spec:
           {{- end }}
           env:
           {{- toYaml .Values.env | nindent 8 }}
-

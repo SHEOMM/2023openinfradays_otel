@@ -1,0 +1,7 @@
+# chart/Chart.yaml
+apiVersion: v2
+name: spring-server
+description: A Helm chart for Spring Server
+type: application
+version: 1.0.0
+appVersion: "0.0.1-SNAPSHOT"
