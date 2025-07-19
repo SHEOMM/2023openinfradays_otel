@@ -27,7 +27,7 @@ env:
   - name: OTEL_PROPAGATORS
     value: "tracecontext,baggage,b3"
   - name: OTEL_RESOURCE_ATTRIBUTES
-    value: "service.name=test-server,deployment.environment=test"
+    value: "service.name=test-server"
   - name: OTEL_EXPORTER_OTLP_PROTOCOL
     value: "grpc"
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
