@@ -1,12 +1,8 @@
-repositories:
-  - name: local
-    url: file://./chart
-
 releases:
   - name: spring-server
     namespace: server
-    chart: local/spring-server
-    version: 1.0.0
+    chart: ./chart  # 로컬 경로로 직접 참조
+    # version: 1.0.0  # 로컬 차트에서는 version 제거
     values:
-      - values.yaml
+      - ./chart/values.yaml  # 정확한 경로 지정
     createNamespace: true
