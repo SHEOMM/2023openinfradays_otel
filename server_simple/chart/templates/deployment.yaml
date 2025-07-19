@@ -29,3 +29,14 @@ spec:
           - name: {{ .name }}
             value: {{ .value | quote }}
           {{- end }}
+          # Logback 설정 파일 경로 지정
+          - name: LOGGING_CONFIG
+            value: "/etc/logback/logback.xml"
+          volumeMounts:
+            - name: logback-config
+              mountPath: /etc/logback
+              readOnly: true
+      volumes:
+        - name: logback-config
+          configMap:
+            name: {{ .Values.app.name }}-logback-config
