@@ -36,20 +36,22 @@ config:
       send_batch_max_size: 4096
     k8sattributes:
       auth_type: "serviceAccount"
-      passthrough: true
+      passthrough: false
       extract:
         metadata:
           - k8s.deployment.name
-    attributes:
-      actions:
-        # 필요한 라벨만 유지
+    resource:
+      attributes:
+        # 모든 k8s 관련 속성 제거하고 필요한 것만 유지
         - key: deployment_name
           from_attribute: k8s.deployment.name
           action: upsert
         - key: service_name
           from_attribute: service.name
           action: upsert
-        # 불필요한 속성들 제거
+        # 기존 k8s 속성들 모두 삭제
+        - key: k8s.deployment.name
+          action: delete
         - key: k8s.pod.name
           action: delete
         - key: k8s.namespace.name
@@ -58,11 +60,9 @@ config:
           action: delete
         - key: k8s.replicaset.name
           action: delete
-        - key: service.instance.id
+        - key: k8s.node.name
           action: delete
-        - key: deployment.environment
-          action: delete
-        - key: service.namespace
+        - key: k8s.pod.ip
           action: delete
 
   # connectors를 별도 섹션으로 분리
@@ -96,7 +96,7 @@ config:
         exporters: [otlp/tempo, spanmetrics, debug]  # spanmetrics를 connector로 사용
       logs:
         receivers: [otlp]
-        processors: [memory_limiter, k8sattributes, attributes, batch]
+        processors: [memory_limiter, k8sattributes, resource, batch]
         exporters: [otlphttp, debug]
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
