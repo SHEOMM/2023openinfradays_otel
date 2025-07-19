@@ -1,0 +1,12 @@
+repositories:
+  - name: local
+    url: file://./chart
+
+releases:
+  - name: spring-server
+    namespace: server
+    chart: local/spring-server
+    version: 1.0.0
+    values:
+      - values.yaml
+    createNamespace: true

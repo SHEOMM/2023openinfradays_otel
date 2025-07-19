@@ -1,0 +1,64 @@
+app:
+  name: spring-server
+  namespace: server
+
+# Deployment 설정
+replicaCount: 1
+
+image:
+  repository: spring-server
+  tag: latest
+  pullPolicy: Never
+
+# Service 설정
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+    - name: metrics
+      port: 9464
+      targetPort: 9464
+
+env:
+  - name: SENTRY_ENVIRONMENT
+    value: test
+  - name: OTEL_SERVICE_NAME
+    value: "test-server"
+  - name: OTEL_PROPAGATORS
+    value: "tracecontext,baggage,b3"
+  - name: OTEL_RESOURCE_ATTRIBUTES
+    value: "service.name=test-server,deployment.environment=test"
+  - name: OTEL_EXPORTER_OTLP_PROTOCOL
+    value: "grpc"
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: "http://opentelemetry-collector.monitoring.svc.cluster.local:4317"
+  - name: OTEL_LOGS_EXPORTER
+    value: "otlp"
+
+podAnnotations:
+  instrumentation.opentelemetry.io/inject-java: "otel/otel-instrumentation"
+
+
+  logback.xml: |
+    <configuration>
+      <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+      <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+          <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+              <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+          </encoder>
+      </appender>
+
+      <logger name="TEST_LOGGER" level="TRACE" />
+
+      <logger name="org.springframework.web" level="INFO"/>
+      <logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" level="OFF"/>
+      <logger name="org.hibernate.engine.internal.StatefulPersistenceContext" level="ERROR"/>
+      <logger name="reactor.netty.resources.PooledConnectionProvider" level="OFF"/>
+
+      <root level="INFO">
+          <appender-ref ref="CONSOLE" />
+      </root>
+    </configuration>
