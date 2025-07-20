@@ -82,7 +82,7 @@ config:
       tls:
         insecure: true
     prometheusremotewrite:
-      endpoint: "http://prometheus-server.monitoring.svc.cluster.local:9090/api/v1/write"
+      endpoint: "http://prometheus-server.monitoring.svc.cluster.local:80/api/v1/write"
 
 
   service:
