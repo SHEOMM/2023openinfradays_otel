@@ -36,11 +36,13 @@ datasources:
         jsonData:
           tracesToLogs:
             datasourceUid: 'loki'
-            tags: ['job', 'instance', 'pod', 'namespace']
-            spanStartTimeShift: '1s'
-            spanEndTimeShift: '1s'
-            filterByTraceID: true
-            filterBySpanID: false
+            tags: [ 'trace_id' ]
+            mappedTags:
+              - key: 'service_name'
+                value: 'service.name'
+            mapTagNamesEnabled: true
+            spanStartTimeShift: '-5m'
+            spanEndTimeShift: '5m'
 
 dashboardProviders:
   dashboardproviders.yaml:
