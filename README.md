@@ -94,6 +94,7 @@ helmfile apply -l name=opentelemetry-collector
 ```bash 
 # client application 배포
 cd client
+chmod +x ./gradlew
 eval $(minikube docker-env) # minikube docker 환경으로 설정
 ./gradlew jibDockerBuild
 kubectl apply -f ./kube.yaml
@@ -102,13 +103,17 @@ kubectl apply -f ./kube.yaml
 cd ..
 
 kubectl create namespace otel
-helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-helm upgrade -i opentelemetry-operator open-telemetry/opentelemetry-operator -n otel --set admissionWebhooks.certManager.enabled=false --set admissionWebhooks.autoGenerateCert=true --wait
+#  OpenTelemetry Operator와 webhook이 준비된 이후 실행 가능
+# 준비 상태는 kubectl logs -n opentelemetry-operator-system deployment/opentelemetry-operator -c manager
+# kubectl get endpoints -n opentelemetry-operator-system opentelemetry-operator-webhook
+
+# 확인 후 넘어가기
 kubectl apply -f otel/crd.yaml
 
 # server application 배포
 cd server
 eval $(minikube docker-env)
+chmod +x ./gradlew
 ./gradlew jibDockerBuild
 kubectl apply -f ./kube.yaml
 ```
@@ -116,7 +121,11 @@ kubectl apply -f ./kube.yaml
 server_simple 배포 방법
 
 ```bash
-
+cd server_simple
+eval $(minikube docker-env)
+chmod +x ./gradlew
+./gradlew jibDockerBuild
+helmfile sync
 ```
 
 ### 04. application test
