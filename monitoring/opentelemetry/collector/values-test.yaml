@@ -39,38 +39,35 @@ config:
       passthrough: true
     resource:
       attributes:
-        # 모든 k8s 관련 속성 제거하고 필요한 것만 유지
+        # 필수 속성들 유지
+        - key: service.instance.id
+          from_attribute: k8s.pod.name
+          action: upsert
+        - key: deployment.environment.name
+          value: "production"  # 또는 적절한 환경 값
+          action: upsert
+
+        # 기존 설정 유지
         - key: deployment_name
           from_attribute: k8s.deployment.name
           action: upsert
         - key: service_name
           from_attribute: service.name
           action: upsert
-        # 기존 k8s 속성들 모두 삭제
-        - key: k8s.deployment.name
-          action: delete
-        - key: k8s.pod.name
-          action: delete
-        - key: k8s.namespace.name
-          action: delete
-        - key: k8s.container.name
-          action: delete
-        - key: k8s.replicaset.name
-          action: delete
-        - key: k8s.node.name
-          action: delete
-        - key: k8s.pod.ip
-          action: delete
 
   # connectors를 별도 섹션으로 분리
   connectors:
     spanmetrics:
       histogram:
         explicit:
-          buckets: [0.5, 0.75, 1, 2.5, 5, 10]
+          buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
       dimensions:
-        - name: deployment_name  # k8s.namespace.name 제거
-        - name: service_name     # k8s.deployment.name 대신 service_name 사용
+        - name: deployment_name
+        - name: service_name
+        - name: service.instance.id  # 추가
+        - name: deployment.environment.name  # 추가
+        - name: http.method  # HTTP 메트릭을 위해 추가
+        - name: http.status_code  # HTTP 메트릭을 위해 추가
       metrics_flush_interval: 15s
 
   exporters:
@@ -84,6 +81,11 @@ config:
       endpoint: "http://tempo.monitoring.svc.cluster.local:4317"
       tls:
         insecure: true
+    otlphttp/prometheus:
+      endpoint: "http://prometheus-server.monitoring.svc.cluster.local:9090/api/v1/otlp"
+      tls:
+        insecure: true
+
 
   service:
     pipelines:
@@ -98,4 +100,4 @@ config:
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
         processors: [batch]
-        exporters: [debug]
+        exporters: [otlphttp/prometheus, debug]
