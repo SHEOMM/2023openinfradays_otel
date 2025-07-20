@@ -73,15 +73,15 @@ config:
         explicit:
           buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
       dimensions:
-        - name: service.name
-        - name: span.name
         - name: http.route
         - name: http.method
-        - name: status.code
         - name: k8s.deployment.name
       metrics_flush_interval: 15s
       exemplars:
         enabled: true
+      resource_metrics_key_attributes:
+        - service.name
+        - http.method
 
   exporters:
     debug:
