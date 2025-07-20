@@ -45,8 +45,8 @@ datasources:
               - key: 'http.status_code'
                 value: 'http_status_code'
             mapTagNamesEnabled: true
-            spanStartTimeShift: '-1m'
-            spanEndTimeShift: '1m'
+            spanStartTimeShift: '-5m'
+            spanEndTimeShift: '5m'
 
 dashboardProviders:
   dashboardproviders.yaml:
