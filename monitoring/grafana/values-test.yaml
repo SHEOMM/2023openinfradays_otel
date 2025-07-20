@@ -38,8 +38,14 @@ datasources:
             datasourceUid: 'loki'
             tags: [ 'trace_id' ]
             mappedTags:
-              - key: 'service_name'          # Loki에서 사용하는 레이블명
-                value: 'resource.service.name'  # Tempo에서 가져올 속성명
+              - key: 'resource.service.name'  # Tempo에서 가져올 속성명
+                value: 'service_name'         # Loki에서 사용하는 레이블명
+              - key: 'http.method'            # Tempo에서 가져올 속성명
+                value: 'http_method'          # Loki에서 사용하는 레이블명
+              - key: 'http.status_code'       # Tempo에서 가져올 속성명
+                value: 'http_status_code'     # Loki에서 사용하는 레이블명
+              - key: 'http.route'             # Tempo에서 가져올 속성명
+                value: 'http_route'           # Loki에서 사용하는 레이블명
             mapTagNamesEnabled: true
             spanStartTimeShift: '-1m'
             spanEndTimeShift: '1m'
