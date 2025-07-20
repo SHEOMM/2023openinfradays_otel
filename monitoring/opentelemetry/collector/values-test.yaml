@@ -54,21 +54,23 @@ config:
         - key: service_name
           from_attribute: service.name
           action: upsert
-
-  # connectors를 별도 섹션으로 분리
   connectors:
     spanmetrics:
+      namespace: traces.spanmetrics
+      # histogram, dimensions 등이 여기에 위치해야 합니다.
       histogram:
         explicit:
           buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
       dimensions:
-        - name: deployment_name
-        - name: service_name
-        - name: service.instance.id  # 추가
-        - name: deployment.environment.name  # 추가
-        - name: http.method  # HTTP 메트릭을 위해 추가
-        - name: http.status_code  # HTTP 메트릭을 위해 추가
+        - service.name  # service_name으로 조회하기 위해 필수
+        - span.name     # "GET /test/hello" 같은 span 이름으로 조회하기 위해 필수
+        - http.route    # HTTP 라우트 기준으로 조회하려면 추가
+        - http.method   # HTTP 메서드 기준
+        - status.code   # 성공/에러 여부를 구분하기 위해 필수 (OK, ERROR 등)
+        - k8s.deployment.name # 쿠버네티스 배포 단위로 보기 위해 추가
       metrics_flush_interval: 15s
+      exemplars:
+        enabled: true
 
   exporters:
     debug:
@@ -97,5 +99,5 @@ config:
         exporters: [otlphttp, debug]
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
-        processors: [k8sattributes, resource, batch]
+        processors: [batch]
         exporters: [prometheusremotewrite, debug]
