@@ -36,8 +36,6 @@ datasources:
         jsonData:
           tracesToLogs:
             datasourceUid: 'loki'
-            filterByTraceID: true
-            filterBySpanID: true
             query: '{service_name="${__span.serviceName}"} | trace_id="${__span.traceId}"'
             spanStartTimeShift: '-3m'
             spanEndTimeShift: '3m'
