@@ -41,9 +41,6 @@ datasources:
             query: '{service_name="${__span.serviceName}"} | trace_id="${__span.traceId}"'
             spanStartTimeShift: '-3m'
             spanEndTimeShift: '3m'
-            mappedTags:
-              - key: 'resource.service.name'
-                value: 'service_name'
 
 dashboardProviders:
   dashboardproviders.yaml:
