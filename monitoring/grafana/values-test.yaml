@@ -36,19 +36,19 @@ datasources:
         jsonData:
           tracesToLogs:
             datasourceUid: 'loki'
-            tags: [ 'trace_id' ]
+            tags: [ 'trace_id' ]  # 이 부분이 trace_id 자동 추가를 담당
             mappedTags:
-              - key: 'resource.service.name'  # Tempo에서 가져올 속성명
-                value: 'service_name'         # Loki에서 사용하는 레이블명
-              - key: 'http.method'            # Tempo에서 가져올 속성명
-                value: 'http_method'          # Loki에서 사용하는 레이블명
-              - key: 'http.status_code'       # Tempo에서 가져올 속성명
-                value: 'http_status_code'     # Loki에서 사용하는 레이블명
-              - key: 'http.route'             # Tempo에서 가져올 속성명
-                value: 'http_route'           # Loki에서 사용하는 레이블명
-            mapTagNamesEnabled: true
-            spanStartTimeShift: '-1m'
-            spanEndTimeShift: '1m'
+              - key: 'resource.service.name'
+                value: 'service_name'
+              - key: 'http.method'
+                value: 'http_method'
+              - key: 'http.status_code'
+                value: 'http_status_code'
+              - key: 'http.route'
+                value: 'http_route'
+            # trace_id 필드 설정 추가
+            filterByTraceID: true
+            filterBySpanID: false
 
 dashboardProviders:
   dashboardproviders.yaml:
