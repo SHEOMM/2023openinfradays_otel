@@ -81,10 +81,8 @@ config:
       endpoint: "http://tempo.monitoring.svc.cluster.local:4317"
       tls:
         insecure: true
-    otlphttp/prometheus:
-      endpoint: "http://prometheus-server.monitoring.svc.cluster.local:9090/api/v1/otlp"
-      tls:
-        insecure: true
+    prometheusremotewrite:
+      endpoint: "http://prometheus-server.monitoring.svc.cluster.local:9090/api/v1/write"
 
 
   service:
@@ -100,4 +98,4 @@ config:
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
         processors: [batch]
-        exporters: [otlphttp/prometheus, debug]
+        exporters: [prometheusremotewrite, debug]

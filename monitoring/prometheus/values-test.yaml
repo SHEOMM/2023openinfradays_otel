@@ -3,15 +3,6 @@ server:
     - web.enable-remote-write-receiver
     - web.enable-lifecycle
     - enable-feature=exemplar-storage
-    - enable-feature=otlp-write-receiver
-  # OTLP 엔드포인트 설정 추가
-  extraArgs:
-    otlp.keep-identifying-resource-attributes: "true"
-    otlp.promote-resource-attributes: |
-      service.instance.id,service.name,service.namespace,deployment.environment.name,service.version,cloud.availability_zone,cloud.region,container.name,deployment.environment,k8s.cluster.name,k8s.container.name,k8s.cronjob.name,k8s.daemonset.name,k8s.deployment.name,k8s.job.name,k8s.namespace.name,k8s.pod.name,k8s.replicaset.name,k8s.statefulset.name
-# adds additional scrape configs to prometheus.yml
-# must be a string so you have to add a | after extraScrapeConfigs:
-# example adds prometheus-blackbox-exporter scrape config
 extraScrapeConfigs: |
   - job_name: 'kubernetes_pods'
     kubernetes_sd_configs:
