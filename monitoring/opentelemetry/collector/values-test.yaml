@@ -89,13 +89,13 @@ config:
     pipelines:
       traces:
         receivers: [otlp]
-        processors: [memory_limiter, k8sattributes, batch]
+        processors: [memory_limiter, k8sattributes, resource, batch]
         exporters: [otlp/tempo, spanmetrics, debug]  # spanmetrics를 connector로 사용
       logs:
         receivers: [otlp]
-        processors: [memory_limiter, k8sattributes, batch]
+        processors: [memory_limiter, k8sattributes, resource, batch]
         exporters: [otlphttp, debug]
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
-        processors: [batch]
+        processors: [k8sattributes, resource, batch]
         exporters: [prometheusremotewrite, debug]
