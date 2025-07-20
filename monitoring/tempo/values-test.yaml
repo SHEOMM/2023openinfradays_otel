@@ -6,12 +6,6 @@ storage:
     wal:
       path: /tmp/tempo/wal
     retention: 72h
-  # wal?
-  wal:
-    path: /tmp/tempo/mg_wal
-# 서비스 그래프 검토중
-metrics_generator:
-  enabled: true
 
   remote_write_url: http://prometheus-server.monitoring.svc.cluster.local/api/v1/write
 
