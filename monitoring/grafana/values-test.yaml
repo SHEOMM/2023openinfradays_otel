@@ -36,6 +36,7 @@ datasources:
         jsonData:
           tracesToLogs:
             datasourceUid: 'loki'
+            useCustomQuery: true
             query: '{service_name="${__span.serviceName}"} | trace_id="${__span.traceId}"'
             spanStartTimeShift: '-3m'
             spanEndTimeShift: '3m'
