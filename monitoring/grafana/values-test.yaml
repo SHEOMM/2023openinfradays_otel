@@ -38,10 +38,7 @@ datasources:
             datasourceUid: 'loki'
             filterByTraceID: true
             filterBySpanID: true
-            # 4. (권장) Loki 쿼리를 최적화합니다.
-            # 서비스 이름으로 먼저 필터링 후 trace_id를 검색하여 더 빠릅니다.
-            query: '{service_name="${__span.serviceName}"} |= "${__span.traceId}"'
-
+            query: '{service_name="${__span.serviceName}"} | trace_id="${__span.traceId}"'
             spanStartTimeShift: '-3m'
             spanEndTimeShift: '3m'
             mappedTags:
