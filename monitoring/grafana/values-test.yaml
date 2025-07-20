@@ -36,17 +36,17 @@ datasources:
         jsonData:
           tracesToLogs:
             datasourceUid: 'loki'
-            tags: [ 'trace_id' ]  # 이 부분이 trace_id 자동 추가를 담당
+            filterByTraceID: true
+            filterBySpanID: true
+            # 4. (권장) Loki 쿼리를 최적화합니다.
+            # 서비스 이름으로 먼저 필터링 후 trace_id를 검색하여 더 빠릅니다.
+            query: '{service_name="${__span.serviceName}"} |= "${__span.traceId}"'
+
+            spanStartTimeShift: '-3m'
+            spanEndTimeShift: '3m'
             mappedTags:
               - key: 'resource.service.name'
                 value: 'service_name'
-              - key: 'http.method'
-                value: 'http_method'
-              - key: 'http.status_code'
-                value: 'http_status_code'
-            mapTagNamesEnabled: true
-            spanStartTimeShift: '-5m'
-            spanEndTimeShift: '5m'
 
 dashboardProviders:
   dashboardproviders.yaml:
