@@ -37,6 +37,17 @@ config:
     k8sattributes:
       auth_type: "serviceAccount"
       passthrough: true
+    metricstransform:
+      transforms:
+        # 'traces.span.metrics.calls' -> 'traces_spanmetrics_calls_total'
+        - include: traces.span.metrics.calls
+          action: update
+          new_name: traces_spanmetrics_calls_total
+        # 'traces.span.metrics.duration' -> 'traces_spanmetrics_latency'
+        # (_bucket, _count, _sum 접미사는 exporter가 자동으로 추가해 줌)
+        - include: traces.span.metrics.duration
+          action: update
+          new_name: traces_spanmetrics_latency
     resource:
       attributes:
         # 필수 속성들 유지
@@ -54,6 +65,7 @@ config:
         - key: service_name
           from_attribute: service.name
           action: upsert
+
   connectors:
     spanmetrics:
       namespace: traces.spanmetrics
@@ -99,5 +111,5 @@ config:
         exporters: [otlphttp, debug]
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
-        processors: [batch]
+        processors: [batch, metricstransform]
         exporters: [prometheusremotewrite, debug]
