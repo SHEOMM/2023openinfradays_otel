@@ -36,10 +36,7 @@ config:
       send_batch_max_size: 4096
     k8sattributes:
       auth_type: "serviceAccount"
-      passthrough: false
-      extract:
-        metadata:
-          - k8s.deployment.name
+      passthrough: true
     resource:
       attributes:
         # 모든 k8s 관련 속성 제거하고 필요한 것만 유지
@@ -96,7 +93,7 @@ config:
         exporters: [otlp/tempo, spanmetrics, debug]  # spanmetrics를 connector로 사용
       logs:
         receivers: [otlp]
-        processors: [memory_limiter, k8sattributes, resource, batch]
+        processors: [memory_limiter, k8sattributes, batch]
         exporters: [otlphttp, debug]
       metrics:
         receivers: [spanmetrics]  # connector에서 메트릭 수신
