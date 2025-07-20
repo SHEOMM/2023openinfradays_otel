@@ -34,12 +34,15 @@ datasources:
         url: http://tempo.monitoring.svc.cluster.local:3200
         access: proxy
         jsonData:
-          tracesToLogs:
-            datasourceUid: 'loki'
+          tracesToLogs: # ← 블록 전체 교체
+            datasourceUid: loki
+            spanStartTimeShift: -3m
+            spanEndTimeShift: 3m
+            filterByTraceID: true
+            filterBySpanID: false
             useCustomQuery: true
-            query: '{service_name="${__span.serviceName}"} | trace_id="${__span.traceId}"'
-            spanStartTimeShift: '-3m'
-            spanEndTimeShift: '3m'
+            query: |
+              {service_name="${__span.serviceName}"} | trace_id="${__span.traceId}"
 
 dashboardProviders:
   dashboardproviders.yaml:
