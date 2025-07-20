@@ -34,7 +34,7 @@ datasources:
         url: http://tempo.monitoring.svc.cluster.local:3200
         access: proxy
         jsonData:
-          tracesToLogs: # ← 블록 전체 교체
+          tracesToLogsV2:
             datasourceUid: loki
             spanStartTimeShift: -3m
             spanEndTimeShift: 3m
