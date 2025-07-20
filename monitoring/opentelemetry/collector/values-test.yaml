@@ -69,17 +69,16 @@ config:
   connectors:
     spanmetrics:
       namespace: traces.spanmetrics
-      # histogram, dimensions 등이 여기에 위치해야 합니다.
       histogram:
         explicit:
           buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
       dimensions:
-        - service.name  # service_name으로 조회하기 위해 필수
-        - span.name     # "GET /test/hello" 같은 span 이름으로 조회하기 위해 필수
-        - http.route    # HTTP 라우트 기준으로 조회하려면 추가
-        - http.method   # HTTP 메서드 기준
-        - status.code   # 성공/에러 여부를 구분하기 위해 필수 (OK, ERROR 등)
-        - k8s.deployment.name # 쿠버네티스 배포 단위로 보기 위해 추가
+        - name: service.name
+        - name: span.name
+        - name: http.route
+        - name: http.method
+        - name: status.code
+        - name: k8s.deployment.name
       metrics_flush_interval: 15s
       exemplars:
         enabled: true
