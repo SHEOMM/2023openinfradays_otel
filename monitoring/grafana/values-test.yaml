@@ -44,11 +44,9 @@ datasources:
                 value: 'http_method'
               - key: 'http.status_code'
                 value: 'http_status_code'
-              - key: 'http.route'
-                value: 'http_route'
-            # trace_id 필드 설정 추가
-            filterByTraceID: true
-            filterBySpanID: false
+            mapTagNamesEnabled: true
+            spanStartTimeShift: '-1m'
+            spanEndTimeShift: '1m'
 
 dashboardProviders:
   dashboardproviders.yaml:
