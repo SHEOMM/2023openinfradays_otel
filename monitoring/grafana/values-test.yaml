@@ -38,11 +38,11 @@ datasources:
             datasourceUid: 'loki'
             tags: [ 'trace_id' ]
             mappedTags:
-              - key: 'service_name'
-                value: 'service.name'
+              - key: 'service_name'          # Loki에서 사용하는 레이블명
+                value: 'resource.service.name'  # Tempo에서 가져올 속성명
             mapTagNamesEnabled: true
-            spanStartTimeShift: '-5m'
-            spanEndTimeShift: '5m'
+            spanStartTimeShift: '-1m'
+            spanEndTimeShift: '1m'
 
 dashboardProviders:
   dashboardproviders.yaml:
