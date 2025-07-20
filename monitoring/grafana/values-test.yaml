@@ -38,8 +38,9 @@ datasources:
             datasourceUid: loki
             spanStartTimeShift: -3m
             spanEndTimeShift: 3m
-            filterByTraceID: false
-            filterBySpanID: false
+            tags:
+              - key: 'resource.service.name'
+                value: 'service_name'
             customQuery: true
             query: '{service_name="$${__span.serviceName}"} | trace_id="$${__span.traceId}"'
 
