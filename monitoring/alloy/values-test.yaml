@@ -1,5 +1,15 @@
 # Grafana Alloy는 기본적으로 StatefulSet으로 배포됩니다.
 # 기존 Collector처럼 Deployment로 사용하기 위해 controller.type을 'deployment'로 설정합니다.
+
+alloy:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
 controller:
   type: 'deployment'
   replicas: 3
@@ -11,13 +21,6 @@ controller:
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
   # 기존 Collector의 리소스 요청/제한을 그대로 적용합니다.
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
 
 # Alloy의 핵심 설정은 ConfigMap을 통해 River 포맷으로 전달됩니다.
 # 기존 collector-values-test.yaml의 config 섹션을 otelcol 컴포넌트로 변환합니다.
