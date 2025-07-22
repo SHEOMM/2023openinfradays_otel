@@ -53,12 +53,12 @@ releases:
     needs:
       - cert-manager/cert-manager
 
-  - name: opentelemetry-collector
+  - name: alloy # opentelemetry-collector를 alloy로 대체
     namespace: monitoring
-    chart: open-telemetry/opentelemetry-collector
-    version: 0.126.0
+    chart: grafana/alloy # chart 경로 변경
+    version: 1.1.2 # 최신 안정 버전 (2025년 7월 기준, 필요시 확인 후 변경)
     values:
-      - "../opentelemetry/collector/values-test.yaml"
+      - "../alloy/values-test.yaml" # 새로 생성한 alloy values 파일 경로
     needs:
       - opentelemetry-operator-system/opentelemetry-operator
       - monitoring/loki

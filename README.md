@@ -68,6 +68,7 @@ helmfile apply -l name=tempo
 helmfile apply -l name=loki
 helmfile apply -l name=opentelemetry-operator
 helmfile apply -l name=grafana
+helmfile apply -l name=alloy
 helmfile apply -l name=opentelemetry-collector
 ```
 > prometheus : cpu, memory 데이터 수집 + server_http_duration_bucket 과 exemplars 로 지연 api 확인 **metric 저장소**   

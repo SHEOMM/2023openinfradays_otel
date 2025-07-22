@@ -1,0 +1,203 @@
+# Grafana Alloy는 기본적으로 StatefulSet으로 배포됩니다.
+# 기존 Collector처럼 Deployment로 사용하기 위해 controller.type을 'deployment'로 설정합니다.
+controller:
+  type: 'deployment'
+  replicas: 3
+  # 기존 Collector의 HPA 설정을 그대로 적용합니다.
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  # 기존 Collector의 리소스 요청/제한을 그대로 적용합니다.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Alloy의 핵심 설정은 ConfigMap을 통해 River 포맷으로 전달됩니다.
+# 기존 collector-values-test.yaml의 config 섹션을 otelcol 컴포넌트로 변환합니다.
+configMap:
+  create: true
+  content: |
+    // OTLP 수신기를 설정합니다.
+    otelcol.receiver.otlp "default" {
+      grpc {
+        endpoint = "0.0.0.0:4317"
+      }
+      http {
+        endpoint = "0.0.0.0:4318"
+      }
+    }
+
+    // Tempo로 Trace를 내보내는 익스포터를 설정합니다.
+    otelcol.exporter.otlp "tempo" {
+      tls {
+        insecure = true
+      }
+      client {
+        endpoint = "tempo.monitoring.svc.cluster.local:4317"
+      }
+    }
+
+    // Loki로 로그를 내보내는 익스포터를 설정합니다.
+    otelcol.exporter.otlphttp "loki" {
+      tls {
+        insecure = true
+      }
+      endpoint = "loki-gateway.monitoring.svc.cluster.local/otlp"
+    }
+
+    // Prometheus로 메트릭을 내보내는 익스포터를 설정합니다.
+    otelcol.exporter.prometheusremotewrite "prometheus" {
+      endpoint = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+    }
+    
+    // 디버깅용 로깅 익스포터를 설정합니다.
+    otelcol.exporter.logging "debug" {
+      verbosity = "detailed"
+    }
+
+    // Trace에서 메트릭을 생성하는 spanmetrics 커넥터를 설정합니다.
+    otelcol.connector.spanmetrics "default" {
+      namespace = "traces.spanmetrics"
+      histogram {
+        explicit {
+          buckets = [ "0.5s", "0.75s", "1s", "2.5s", "5s", "10s" ]
+        }
+      }
+      dimensions = [
+        "http.route",
+        "http.method",
+        "k8s.deployment.name",
+      ]
+      metrics_flush_interval = "15s"
+
+      output {
+        metrics = [otelcol.processor.metricstransform.default.input]
+      }
+    }
+
+    // 프로세서를 설정합니다.
+    otelcol.processor.memory_limiter "default" {
+      check_interval        = "1s"
+      limit_percentage      = 80
+      spike_limit_percentage = 25
+    }
+
+    otelcol.processor.batch "default" {
+      send_batch_size = 512
+      timeout         = "2s"
+      send_batch_max_size = 1024
+    }
+
+    // health check 관련 span을 필터링합니다.
+    otelcol.processor.filter "health_checks" {
+      error_mode = "ignore"
+      traces {
+        span = [
+          'IsMatch(name, ".*/actuator/health.*")',
+          'IsMatch(attributes["http.target"], ".*/actuator/health.*")',
+          'IsMatch(attributes["http.url"], ".*/actuator/health.*")',
+          'IsMatch(attributes["url.path"], ".*/actuator/health.*")',
+          'IsMatch(attributes["http.route"], ".*/actuator/health.*")',
+          'IsMatch(name, ".*/actuator/prometheus.*")',
+          'IsMatch(name, ".*OperationHandler.handle.*")',
+          'IsMatch(name, "INFO")',
+          'IsMatch(name, "PING")',
+          'IsMatch(name, "HELLO")',
+          'IsMatch(name, "grpc.health.v1.Health/Check")',
+        ]
+      }
+    }
+
+    // 쿠버네티스 속성을 추가합니다.
+    otelcol.processor.k8sattributes "default" {
+      auth_type    = "serviceAccount"
+      passthrough  = true
+    }
+
+    // 리소스 속성을 재정의합니다.
+    otelcol.processor.resource "default" {
+      attribute {
+        key    = "deployment_name"
+        from_attribute = "k8s.deployment.name"
+        action = "upsert"
+      }
+      attribute {
+        key = "service_name"
+        from_attribute = "service.name"
+        action = "upsert"
+      }
+    
+      // Alloy에서는 필요한 속성만 남기는 방식이 더 안정적입니다.
+      // delete 액션 대신 필요한 속성을 명시적으로 관리하는 것을 권장합니다.
+      // 여기서는 기존 로직을 최대한 유지했습니다.
+      attribute { key = "k8s.deployment.name", action = "delete" }
+      attribute { key = "k8s.pod.name", action = "delete" }
+      attribute { key = "k8s.namespace.name", action = "delete" }
+      attribute { key = "k8s.container.name", action = "delete" }
+      attribute { key = "k8s.replicaset.name", action = "delete" }
+      attribute { key = "k8s.node.name", action = "delete" }
+      attribute { key = "k8s.pod.ip", action = "delete" }
+    }
+
+    // spanmetrics의 이름을 변환합니다.
+    otelcol.processor.metricstransform "default" {
+      transform {
+        include = "traces.spanmetrics.calls"
+        action = "update"
+        new_name = "traces_spanmetrics_calls_total"
+      }
+      transform {
+        include = "traces.spanmetrics.duration"
+        action = "update"
+        new_name = "traces_spanmetrics_latency"
+      }
+
+      output {
+        metrics = [otelcol.exporter.prometheusremotewrite.prometheus.input]
+      }
+    }
+
+    // 파이프라인을 정의합니다.
+    otelcol.service "default" {
+      pipeline "traces" {
+        receivers = [otelcol.receiver.otlp.default]
+        processors = [
+          otelcol.processor.memory_limiter.default, 
+          otelcol.processor.filter.health_checks, 
+          otelcol.processor.k8sattributes.default, 
+          otelcol.processor.batch.default
+        ]
+        exporters = [
+          otelcol.exporter.otlp.tempo,
+          otelcol.connector.spanmetrics.default,
+          otelcol.exporter.logging.debug
+        ]
+      }
+
+      pipeline "logs" {
+        receivers = [otelcol.receiver.otlp.default]
+        processors = [
+          otelcol.processor.memory_limiter.default,
+          otelcol.processor.k8sattributes.default,
+          otelcol.processor.resource.default,
+          otelcol.processor.batch.default
+        ]
+        exporters = [otelcol.exporter.otlphttp.loki]
+      }
+
+      pipeline "metrics" {
+        receivers = [otelcol.connector.spanmetrics.default]
+        processors = [
+            otelcol.processor.metricstransform.default,
+            otelcol.processor.batch.default
+        ]
+        exporters = [otelcol.exporter.prometheusremotewrite.prometheus]
+      }
+    }
