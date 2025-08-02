@@ -1,0 +1,139 @@
+mode: deployment
+
+replicaCount: 1
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+
+  processors:
+    batch:
+      send_batch_size: 512
+      timeout: 2s
+      send_batch_max_size: 1024
+    memory_limiter:
+      check_interval: 5s
+      limit_percentage: 80
+      spike_limit_percentage: 30
+    groupbytrace:
+      wait_duration: 5s
+      num_traces: 1000
+    k8sattributes:
+      auth_type: "serviceAccount"
+      passthrough: true
+    ## span 속성 제거
+    attributes:
+      actions:
+        - key: thread.name
+          action: delete
+
+    ## resource 속성 제거
+    resource:
+      attributes:
+        - key: deployment_name
+          from_attribute: k8s.deployment.name
+          action: upsert
+        - key: service_name
+          from_attribute: service.name
+          action: upsert
+        - key: k8s.deployment.name
+          action: delete
+        - key: k8s.pod.name
+          action: delete
+        - key: k8s.namespace.name
+          action: delete
+        - key: k8s.container.name
+          action: delete
+        - key: k8s.replicaset.name
+          action: delete
+        - key: k8s.node.name
+          action: delete
+        - key: k8s.pod.ip
+          action: delete
+        - key: process.command_args
+          action: delete
+        - key: telemetry.sdk.version
+          action: delete
+        - key: telemetry.auto.version
+          action: delete
+        - key: telemetry.sdk.language
+          action: delete
+        - key: telemetry.sdk.name
+          action: delete
+        - key: process.executable.path
+          action: delete
+    ## 헬스체크 관련 제거
+    filter/health_checks:
+      error_mode: ignore
+      traces:
+        span:
+          - 'IsMatch(name, ".*/actuator/health.*")'
+          - 'IsMatch(attributes["http.target"], ".*/actuator/health.*")'
+          - 'IsMatch(attributes["http.url"], ".*/actuator/health.*")'
+          - 'IsMatch(attributes["url.path"], ".*/actuator/health.*")'
+          - 'IsMatch(attributes["http.route"], ".*/actuator/health.*")'
+          - 'IsMatch(name, ".*/actuator/prometheus.*")'
+          - 'IsMatch(name, ".*OperationHandler.handle.*")'
+          - 'IsMatch(name, "INFO")'
+          - 'IsMatch(name, "PING")'
+          - 'IsMatch(name, "HELLO")'
+          - 'IsMatch(name, "grpc.health.v1.Health/Check")'
+          - 'IsMatch(attributes["http.method"], "OPTIONS")'
+
+  exporters:
+    # loki 엔드포인트
+    otlphttp:
+      endpoint: "http://loki-gateway.monitoring.svc.cluster.local/otlp"
+      tls:
+        insecure: true
+    ## tailsampling : traceID 기준으로 라우팅
+    loadbalancing/tailsampling:
+      routing_key: "traceID"
+      protocol:
+        otlp:
+          timeout: 1s
+          tls:
+            insecure: true
+      resolver:
+        k8s:
+          service: {{tailsampling collector의 주소}}
+          ports:
+            - 4317
+
+    ## spanmetrics : service name 기준으로 라우팅
+    loadbalancing/spanmetrics:
+      routing_key: "service"
+      protocol:
+        otlp:
+          timeout: 1s
+          tls:
+            insecure: true
+      resolver:
+        k8s:
+          service: {{spanmetrics collector의 주소}}
+          ports:
+            - 4317
+
+  extensions:
+    memory_ballast:
+      size_in_percentage: 40
+  service:
+    extensions:
+      - memory_ballast
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, groupbytrace, transform, attributes, resource, filter/health_checks, batch]
+        exporters: [loadbalancing/spanmetrics, loadbalancing/tailsampling]
+      logs:
+        receivers: [otlp]
+        processors: [memory_limiter, k8sattributes, resource, batch]
+        exporters: [otlphttp]

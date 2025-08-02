@@ -31,4 +31,24 @@ class TestController(
     fun log() {
         testService.simpleLog()
     }
+
+    @GetMapping("/error")
+    fun error() {
+        throw RuntimeException("error")
+    }
+
+    @GetMapping("/longTime")
+    fun longTime(): String {
+        Thread.sleep(5000) // Simulate a long-running operation
+        TestLogger.log(
+            Log(
+                type = LogType.FIRST,
+                HelloLog(
+                    id = "2",
+                    message = "long time no see"
+                )
+            )
+        )
+        return "Long time operation completed!"
+    }
 }

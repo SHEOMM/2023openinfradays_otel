@@ -1,0 +1,69 @@
+mode: deployment
+
+replicaCount: 1
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+
+  processors:
+    batch:
+      send_batch_size: 512
+      timeout: 2s
+      send_batch_max_size: 1024
+    memory_limiter:
+      check_interval: 2s
+      limit_percentage: 70
+      spike_limit_percentage: 25
+  exporters:
+    prometheusremotewrite:
+      endpoint: "http://prometheus-server.monitoring.svc.cluster.local:80/api/v1/write"
+      target_info:
+        enabled: true
+  connectors:
+    spanmetrics:
+      namespace: traces.spanmetrics
+      histogram:
+        explicit:
+          buckets: [ 100ms, 250ms, 500ms, 1s, 5s, 10s ]
+      aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"
+      dimensions:
+        - name: k8s.deployment.name
+      metrics_flush_interval: 15s
+      exemplars:
+        enabled: true
+      events:
+        enabled: true
+        dimensions:
+          - name: exception.type
+      resource_metrics_key_attributes:
+        - service.name
+
+  extensions:
+    memory_ballast:
+      size_in_percentage: 40
+
+  service:
+    extensions:
+      - memory_ballast
+
+    pipelines:
+      #### OTLP -> SPANMETRICS ###
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [spanmetrics]
+
+      #### KIND: SERVER, CONSUMER, PRODUCER
+      metrics/spanmetrics:
+        receivers: [spanmetrics]
+        processors: [memory_limiter, batch]
+        exporters: [prometheusremotewrite]

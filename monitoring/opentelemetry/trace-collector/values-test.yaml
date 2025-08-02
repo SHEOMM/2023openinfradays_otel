@@ -1,0 +1,71 @@
+mode: deployment
+
+replicaCount: 1
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4317"
+
+  processors:
+    batch:
+      send_batch_size: 512
+      timeout: 2s
+      send_batch_max_size: 1024
+    memory_limiter:
+      check_interval: 2s
+      limit_percentage: 70
+      spike_limit_percentage: 25
+
+    tail_sampling:
+      decision_wait: 30s
+      num_traces: 50000
+      expected_new_traces_per_sec: 1500
+      policies:
+        [
+          {
+            name: 500ms,
+            type: latency,
+            latency: {threshold_ms: 500}
+          },
+
+          {
+            name: error,
+            type: status_code,
+            status_code: { status_codes: [ERROR] }
+          },
+
+          {
+            name: 5percent,
+            type: probabilistic,
+            probabilistic: {sampling_percentage: 5}
+          }
+        ]
+
+  exporters:
+    otlphttp:
+      endpoint: "http://tempo.monitoring.svc.cluster.local:4317"
+      sending_queue:
+        enabled: true
+        queue_size: 150000
+
+  extensions:
+    memory_ballast:
+      size_in_percentage: 40
+
+  service:
+    extensions:
+      - memory_ballast
+
+    pipelines:
+      traces/tailsampling:
+        receivers: [otlp]
+        processors: [tail_sampling, memory_limiter, batch]
+        exporters: [otlphttp]
