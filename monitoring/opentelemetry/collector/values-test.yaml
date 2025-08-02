@@ -31,59 +31,81 @@ config:
       limit_percentage: 80
       spike_limit_percentage: 25
     batch:
-      send_batch_size: 2048
-      timeout: 10s
-      send_batch_max_size: 4096
+      send_batch_size: 512
+      timeout: 2s
+      send_batch_max_size: 1024
+    filter/health_checks:
+      error_mode: ignore
+      traces:
+        span:
+          - 'IsMatch(name, ".*/actuator/health.*")'
+          - 'IsMatch(attributes["http.target"], ".*/actuator/health.*")'
+          - 'IsMatch(attributes["http.url"], ".*/actuator/health.*")'
+          - 'IsMatch(attributes["url.path"], ".*/actuator/health.*")'
+          - 'IsMatch(attributes["http.route"], ".*/actuator/health.*")'
+          - 'IsMatch(name, ".*/actuator/prometheus.*")'
+          - 'IsMatch(name, ".*OperationHandler.handle.*")'
+          - 'IsMatch(name, "INFO")'
+          - 'IsMatch(name, "PING")'
+          - 'IsMatch(name, "HELLO")'
+          - 'IsMatch(name, "grpc.health.v1.Health/Check")'
+          - 'IsMatch(attributes["http.method"], "OPTIONS")'
     k8sattributes:
       auth_type: "serviceAccount"
       passthrough: true
-    metricstransform:
-      transforms:
-        # 'traces.spanmetrics.calls' -> 'traces_spanmetrics_calls_total'
-        # 점(.) 위치를 실제 생성되는 메트릭 이름에 맞게 수정합니다.
-        - include: traces.spanmetrics.calls
-          action: update
-          new_name: traces_spanmetrics_calls_total
-        # 'traces.spanmetrics.duration' -> 'traces_spanmetrics_latency'
-        - include: traces.spanmetrics.duration
-          action: update
-          new_name: traces_spanmetrics_latency
     resource:
       attributes:
-        # 필수 속성들 유지
-        - key: service.instance.id
-          from_attribute: k8s.pod.name
-          action: upsert
-        - key: deployment.environment.name
-          value: "production"  # 또는 적절한 환경 값
-          action: upsert
-
-        # 기존 설정 유지
         - key: deployment_name
           from_attribute: k8s.deployment.name
           action: upsert
         - key: service_name
           from_attribute: service.name
           action: upsert
-
+          # 기존 k8s 속성들 모두 삭제
+        - key: k8s.deployment.name
+          action: delete
+        - key: k8s.pod.name
+          action: delete
+        - key: k8s.namespace.name
+          action: delete
+        - key: k8s.container.name
+          action: delete
+        - key: k8s.replicaset.name
+          action: delete
+        - key: k8s.node.name
+          action: delete
+        - key: k8s.pod.ip
+          action: delete
+    metricstransform:
+      # 프로메테우스 스킴에 맞춰서 메트릭 이름 변경
+      transforms:
+        - include: traces.spanmetrics.calls
+          action: update
+          new_name: traces_spanmetrics_calls_total
+        - include: traces.spanmetrics.duration
+          action: update
+          new_name: traces_spanmetrics_latency
   connectors:
     spanmetrics:
       namespace: traces.spanmetrics
       histogram:
         explicit:
-          buckets: [ 0.5, 0.75, 1, 2.5, 5, 10 ]
+          buckets: [ 100ms, 250ms, 500ms, 1s, 5s, 10s ]
+      aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"
       dimensions:
-        - name: http.route
-        - name: http.method
         - name: k8s.deployment.name
       metrics_flush_interval: 15s
       exemplars:
         enabled: true
+      events:
+        enabled: true
+        dimensions:
+          - name: exception.type
       resource_metrics_key_attributes:
         - service.name
-        - http.method
 
   exporters:
+    # 문제가 있다면 해당 파이프라인에 exporter에 debug를 추가하고 디버깅할 수 있습니다
     debug:
       verbosity: detailed
     otlphttp:
@@ -96,19 +118,17 @@ config:
         insecure: true
     prometheusremotewrite:
       endpoint: "http://prometheus-server.monitoring.svc.cluster.local:80/api/v1/write"
-
-
   service:
     pipelines:
       traces:
         receivers: [otlp]
-        processors: [memory_limiter, k8sattributes, resource, batch]
-        exporters: [otlp/tempo, spanmetrics, debug]  # spanmetrics를 connector로 사용
+        processors: [memory_limiter, filter/health_checks, k8sattributes, batch]
+        exporters: [otlp/tempo, spanmetrics]
       logs:
         receivers: [otlp]
         processors: [memory_limiter, k8sattributes, resource, batch]
-        exporters: [otlphttp, debug]
+        exporters: [otlphttp]
       metrics:
-        receivers: [spanmetrics]  # connector에서 메트릭 수신
-        processors: [batch, metricstransform]
-        exporters: [prometheusremotewrite, debug]
+        receivers: [spanmetrics]
+        processors: [metricstransform, batch]
+        exporters: [prometheusremotewrite]

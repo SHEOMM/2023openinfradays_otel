@@ -1,0 +1,143 @@
+# Tempo 전역 설정
+tempo:
+  structuredConfig:
+    # 멀티테넌트 비활성화
+    multitenancy_enabled: false
+
+    # Usage report 비활성화
+    usage_report:
+      reporting_enabled: false
+
+    # Storage 설정 (기존 S3 설정 유지)
+    storage:
+      trace:
+        backend: s3
+        s3:
+          bucket: "tempo-traces"  # MinIO에 생성한 버킷명
+          endpoint: "http://minio.minio.svc.cluster.local:9000"
+          access_key: "minioadmin"
+          secret_key: "minioadmin123"
+          insecure: true
+          s3forcepathstyle: true
+        block:
+          v2_encoding: snappy
+          bloom_filter_false_positive: 0.05
+
+    # Distributor 설정
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+            http:
+              endpoint: 0.0.0.0:4318
+
+    # Ingester 설정
+    ingester:
+      trace_idle_period: 30s
+      max_block_duration: 1h
+      flush_check_period: 10s
+      max_block_bytes: 1073741824
+      max_traces: 10000
+
+    # Query Frontend 설정
+    query_frontend:
+      log_queries_longer_than: 5s
+
+    # Querier 설정
+    querier:
+      frontend_worker:
+        frontend_address: "tempo-query-frontend:9095"
+
+    # Compactor 설정
+    compactor:
+      compaction:
+        block_retention: 72h
+        compacted_block_retention: 1h
+
+# 컴포넌트별 설정
+distributor:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
+  autoscaling:
+    enabled: false
+
+ingester:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  persistence:
+    enabled: true
+    size: 10Gi
+  autoscaling:
+    enabled: false
+
+queryFrontend:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+
+querier:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+
+compactor:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+
+gateway:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# Memcached 비활성화 (S3 사용)
+memcached:
+  enabled: false
+
+memcachedResults:
+  enabled: false
+
+# Metrics Generator 비활성화
+metricsGenerator:
+  enabled: false

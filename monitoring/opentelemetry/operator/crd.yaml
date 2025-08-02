@@ -5,28 +5,27 @@ metadata:
   namespace: otel
 spec:
   exporter:
-    endpoint: http://alloy.monitoring.svc.cluster.local:4317
+    endpoint: http://opentelemetry-collector.monitoring.svc.cluster.local:4317
   propagators:
     - tracecontext
-    - baggage
     - b3
-  sampler:
-    type: parentbased_traceidratio
-    argument: "1"
   java:
     env:
-      - name: OTEL_TRACES_EXPORTER
-        value: otlp
       - name: OTEL_EXPORTER_OTLP_PROTOCOL
         value: grpc
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://alloy.monitoring.svc.cluster.local:4317
+        value: http://opentelemetry-collector.monitoring.svc.cluster.local:4317
       - name: OTEL_METRICS_EXPORTER
         value: prometheus
+      - name: OTEL_TRACES_SAMPLER
+        value: always_on
+      - name: OTEL_TRACES_EXPORTER
+        value: otlp
       - name: OTEL_METRICS_EXEMPLAR_FILTER
         value: always_on
-      # 기본 서비스명 제거 - 각 애플리케이션에서 개별 설정
       - name: OTEL_LOGS_EXPORTER
         value: otlp
       - name: OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
-        value: http://alloy.monitoring.svc.cluster.local:4317
+        value: http://opentelemetry-collector.monitoring.svc.cluster.local:4317
+      - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        value: http://opentelemetry-collector.monitoring.svc.cluster.local:4317
