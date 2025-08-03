@@ -5,9 +5,6 @@ replicaCount: 1
 image:
   repository: otel/opentelemetry-collector-contrib
 
-serviceAccount:
-  create: true
-
 config:
   receivers:
     otlp:
@@ -108,10 +105,8 @@ config:
           tls:
             insecure: true
       resolver:
-        k8s:
-          service: "http://opentelemetry-trace-collector.monitoring.svc.cluster.local:4317"
-          ports:
-            - 4317
+        static:
+          hostname: "http://opentelemetry-trace-collector.monitoring.svc.cluster.local:4317"
 
     ## spanmetrics : service name 기준으로 라우팅
     loadbalancing/spanmetrics:
@@ -122,10 +117,8 @@ config:
           tls:
             insecure: true
       resolver:
-        k8s:
-          service: "http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
-          ports:
-            - 4317
+        static:
+          hostname: "http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
   service:
     pipelines:
       traces:
