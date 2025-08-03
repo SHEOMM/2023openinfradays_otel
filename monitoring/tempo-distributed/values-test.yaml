@@ -52,6 +52,7 @@ tempo:
 
 # 컴포넌트별 설정
 distributor:
+  affinity: {}
   podAntiAffinityType: "none"
   replicas: 1
   resources:
@@ -65,6 +66,7 @@ distributor:
     enabled: false
 
 ingester:
+  affinity: {}
   podAntiAffinityType: "none"
   replicas: 1
   resources:
@@ -81,6 +83,7 @@ ingester:
     enabled: false
 
 queryFrontend:
+  affinity: {}
   replicas: 1
   resources:
     requests:
@@ -93,6 +96,7 @@ queryFrontend:
     enabled: false
 
 querier:
+  affinity: {}
   replicas: 1
   resources:
     requests:
@@ -105,6 +109,7 @@ querier:
     enabled: false
 
 compactor:
+  affinity: {}
   replicas: 1
   resources:
     requests:
