@@ -15,39 +15,39 @@ config:
           endpoint: "0.0.0.0:4318"
 
   processors:
-    batch: { }
-#      send_batch_size: 512
-#      timeout: 2s
-#      send_batch_max_size: 1024
+    batch:
+      send_batch_size: 512
+      timeout: 2s
+      send_batch_max_size: 1024
     memory_limiter:
       check_interval: 2s
       limit_percentage: 70
       spike_limit_percentage: 25
 
-#    tail_sampling:
-#      decision_wait: 30s
-#      num_traces: 50000
-#      expected_new_traces_per_sec: 1500
-#      policies:
-#        [
-#          {
-#            name: 500ms,
-#            type: latency,
-#            latency: {threshold_ms: 500}
-#          },
-#
-#          {
-#            name: error,
-#            type: status_code,
-#            status_code: { status_codes: [ERROR] }
-#          },
-#
-#          {
-#            name: 5percent,
-#            type: probabilistic,
-#            probabilistic: {sampling_percentage: 5}
-#          }
-#        ]
+    tail_sampling:
+      decision_wait: 30s
+      num_traces: 50000
+      expected_new_traces_per_sec: 1500
+      policies:
+        [
+          {
+            name: 500ms,
+            type: latency,
+            latency: {threshold_ms: 500}
+          },
+
+          {
+            name: error,
+            type: status_code,
+            status_code: { status_codes: [ERROR] }
+          },
+
+          {
+            name: 5percent,
+            type: probabilistic,
+            probabilistic: {sampling_percentage: 5}
+          }
+        ]
 
   exporters:
     debug:

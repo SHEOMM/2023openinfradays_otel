@@ -15,10 +15,10 @@ config:
           endpoint: "0.0.0.0:4318"
 
   processors:
-    batch: { }
-#      send_batch_size: 512
-#      timeout: 2s
-#      send_batch_max_size: 1024
+    batch:
+      send_batch_size: 512
+      timeout: 2s
+      send_batch_max_size: 1024
     memory_limiter:
       check_interval: 2s
       limit_percentage: 70
