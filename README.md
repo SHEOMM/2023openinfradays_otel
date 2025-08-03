@@ -133,6 +133,15 @@ helmfile sync
 
 ### 04. application test
 
+
+```bash
+kubectl port-forward svc/spring-server 8080:8080 -n server
+curl localhost:8080/test/hello # custom logger
+curl "localhost:8080/test/log # simple logger
+curl "localhost:8080/test/error" # 런타임 에러
+curl "localhost:8080/test/longTime" # 5초 지연 api
+```
+
 ```bash
 kubectl port-forward svc/spring-client 8080:8080 -n metric
 ```
