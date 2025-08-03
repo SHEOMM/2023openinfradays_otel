@@ -2,6 +2,14 @@ mode: deployment
 
 replicaCount: 1
 
+
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["endpoints"]
+      verbs: ["get", "list", "watch"]
+
 image:
   repository: otel/opentelemetry-collector-contrib
 
