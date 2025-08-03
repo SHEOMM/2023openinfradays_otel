@@ -39,7 +39,6 @@ tempo:
       max_block_duration: 1h
       flush_check_period: 10s
       max_block_bytes: 1073741824
-
     # Querier 설정
     querier:
       frontend_worker:
@@ -53,7 +52,8 @@ tempo:
 
 # 컴포넌트별 설정
 distributor:
-  replicas: 2
+  podAntiAffinityType: "none"
+  replicas: 1
   resources:
     requests:
       cpu: 50m
@@ -65,7 +65,8 @@ distributor:
     enabled: false
 
 ingester:
-  replicas: 2
+  podAntiAffinityType: "none"
+  replicas: 1
   resources:
     requests:
       cpu: 100m
@@ -104,7 +105,8 @@ querier:
     enabled: false
 
 compactor:
-  replicas: 2
+  podAntiAffinityType: "none"
+  replicas: 1
   resources:
     requests:
       cpu: 50m
@@ -116,6 +118,7 @@ compactor:
     enabled: false
 
 gateway:
+  podAntiAffinityType: "none"
   enabled: true
   replicas: 1
   resources:
