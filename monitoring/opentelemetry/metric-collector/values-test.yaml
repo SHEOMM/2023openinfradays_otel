@@ -24,6 +24,8 @@ config:
       limit_percentage: 70
       spike_limit_percentage: 25
   exporters:
+    debug:
+      verbosity: detailed
     prometheusremotewrite:
       endpoint: "http://prometheus-server.monitoring.svc.cluster.local:80/api/v1/write"
       target_info:
@@ -60,10 +62,10 @@ config:
       traces:
         receivers: [otlp]
         processors: [memory_limiter, batch]
-        exporters: [spanmetrics]
+        exporters: [spanmetrics, debug]
 
       #### KIND: SERVER, CONSUMER, PRODUCER
       metrics/spanmetrics:
         receivers: [spanmetrics]
         processors: [memory_limiter, batch]
-        exporters: [prometheusremotewrite]
+        exporters: [prometheusremotewrite, debug]

@@ -89,6 +89,8 @@ config:
           - 'IsMatch(attributes["http.method"], "OPTIONS")'
 
   exporters:
+    debug:
+      verbosity: detailed
     # loki 엔드포인트
     otlphttp:
       endpoint: "http://loki-gateway.monitoring.svc.cluster.local/otlp"
@@ -132,8 +134,8 @@ config:
       traces:
         receivers: [otlp]
         processors: [memory_limiter, groupbytrace, transform, attributes, resource, filter/health_checks, batch]
-        exporters: [loadbalancing/spanmetrics, loadbalancing/tailsampling]
+        exporters: [loadbalancing/spanmetrics, loadbalancing/tailsampling, debug]
       logs:
         receivers: [otlp]
         processors: [memory_limiter, k8sattributes, resource, batch]
-        exporters: [otlphttp]
+        exporters: [otlphttp, debug]
