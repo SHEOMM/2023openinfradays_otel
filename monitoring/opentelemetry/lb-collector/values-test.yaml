@@ -104,7 +104,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: {{tailsampling collector의 주소}}
+          service: http://opentelemetry-trace-collector.monitoring.svc.cluster.local:4317
           ports:
             - 4317
 
@@ -118,7 +118,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: {{spanmetrics collector의 주소}}
+          service: http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317
           ports:
             - 4317
 
