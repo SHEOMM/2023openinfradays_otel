@@ -57,8 +57,9 @@ config:
       sending_queue:
         enabled: true
         queue_size: 150000
-  pipelines:
-    traces/tailsampling:
-      receivers: [otlp]
-      processors: [tail_sampling, memory_limiter, batch]
-      exporters: [otlphttp, debug]
+  service:
+    pipelines:
+      traces/tailsampling:
+        receivers: [otlp]
+        processors: [tail_sampling, memory_limiter, batch]
+        exporters: [otlphttp, debug]

@@ -48,16 +48,16 @@ config:
           - name: exception.type
       resource_metrics_key_attributes:
         - service.name
+  service:
+    pipelines:
+      #### OTLP -> SPANMETRICS ###
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [spanmetrics, debug]
 
-  pipelines:
-    #### OTLP -> SPANMETRICS ###
-    traces:
-      receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [spanmetrics, debug]
-
-    #### KIND: SERVER, CONSUMER, PRODUCER
-    metrics/spanmetrics:
-      receivers: [spanmetrics]
-      processors: [memory_limiter, batch]
-      exporters: [prometheusremotewrite, debug]
+      #### KIND: SERVER, CONSUMER, PRODUCER
+      metrics/spanmetrics:
+        receivers: [spanmetrics]
+        processors: [memory_limiter, batch]
+        exporters: [prometheusremotewrite, debug]
