@@ -127,7 +127,7 @@ config:
     pipelines:
       traces:
         receivers: [otlp]
-        processors: [memory_limiter, groupbytrace, transform, attributes, resource, filter/health_checks, batch]
+        processors: [memory_limiter, groupbytrace, attributes, resource, filter/health_checks, batch]
         exporters: [loadbalancing/spanmetrics, loadbalancing/tailsampling, debug]
       logs:
         receivers: [otlp]
