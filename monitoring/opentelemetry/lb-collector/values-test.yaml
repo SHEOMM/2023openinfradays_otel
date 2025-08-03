@@ -2,7 +2,6 @@ mode: deployment
 
 replicaCount: 1
 
-
 clusterRole:
   create: true
   rules:
@@ -16,9 +15,6 @@ clusterRole:
     - apiGroups: [""]
       resources: ["endpoints"]
       verbs: ["get", "watch", "list"]
-
-clusterRoleBinding:
-  create: true
 
 image:
   repository: otel/opentelemetry-collector-contrib
