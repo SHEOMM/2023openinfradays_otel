@@ -2,20 +2,6 @@ mode: deployment
 
 replicaCount: 1
 
-clusterRole:
-  create: true
-  rules:
-    - apiGroups: [""]
-      resources: ["pods", "namespaces"]
-      verbs: ["get", "watch", "list"]
-    - apiGroups: ["apps", "extensions"]
-      resources: ["replicasets"]
-      verbs: ["get", "watch", "list"]
-
-    - apiGroups: [""]
-      resources: ["endpoints"]
-      verbs: ["get", "watch", "list"]
-
 image:
   repository: otel/opentelemetry-collector-contrib
 
@@ -119,10 +105,8 @@ config:
           tls:
             insecure: true
       resolver:
-        k8s:
-          service: "opentelemetry-trace-collector-opentelemetry-collector.monitoring.svc.cluster.local"
-          ports:
-            - 4317
+        dns:
+          hostname: "otel-trace-collector-headless.monitoring.svc.cluster.local:4317"
 
     ## spanmetrics : service name 기준으로 라우팅
     loadbalancing/spanmetrics:
@@ -133,10 +117,8 @@ config:
           tls:
             insecure: true
       resolver:
-        k8s:
-          service: "opentelemetry-metric-collector-opentelemetry-collector.monitoring.svc.cluster.local"
-          ports:
-            - 4317
+        dns:
+          hostname: "otel-metric-collector-headless.monitoring.svc.cluster.local"
   service:
     pipelines:
       traces:
