@@ -18,7 +18,7 @@ tempo:
           access_key: "minioadmin"
           secret_key: "minioadmin123"
           insecure: true
-          s3forcepathstyle: true
+          forcepathstyle: true
         block:
           v2_encoding: snappy
           bloom_filter_false_positive: 0.05
@@ -39,11 +39,6 @@ tempo:
       max_block_duration: 1h
       flush_check_period: 10s
       max_block_bytes: 1073741824
-      max_traces: 10000
-
-    # Query Frontend 설정
-    query_frontend:
-      log_queries_longer_than: 5s
 
     # Querier 설정
     querier:
