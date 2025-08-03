@@ -14,7 +14,7 @@ tempo:
         backend: s3
         s3:
           bucket: "tempo-traces"  # MinIO에 생성한 버킷명
-          endpoint: "http://minio.minio.svc.cluster.local:9000"
+          endpoint: "minio.minio.svc.cluster.local:9000"
           access_key: "minioadmin"
           secret_key: "minioadmin123"
           insecure: true
