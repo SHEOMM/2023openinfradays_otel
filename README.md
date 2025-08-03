@@ -72,6 +72,7 @@ helmfile apply -l name=alloy
 helmfile apply -l name=opentelemetry-metric-collector
 helmfile apply -l name=opentelemetry-trace-collector
 helmfile apply -l name=opentelemetry-lb-collector
+kubectl apply -f /home/eomseongho/project/2023openinfradays_otel/monitoring/opentelemetry/operator/kube.yaml
 ```
 > prometheus : cpu, memory 데이터 수집 + server_http_duration_bucket 과 exemplars 로 지연 api 확인 **metric 저장소**   
 > promtail + loki : promtail이 로그를 수집(logstash 또는 fluentd 대체 가능), loki에 저장(elasticsearch 등 대체 가능) **log 저장소**   
