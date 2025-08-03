@@ -49,17 +49,6 @@ config:
       resource_metrics_key_attributes:
         - service.name
 
-  extensions:
-    health_check:
-      endpoint: "0.0.0.0:13133"
-    memory_ballast:
-      size_in_percentage: 40
-
-  service:
-    extensions:
-      - memory_ballast
-      - health_check
-
     pipelines:
       #### OTLP -> SPANMETRICS ###
       traces:

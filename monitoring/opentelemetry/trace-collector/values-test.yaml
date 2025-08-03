@@ -58,17 +58,6 @@ config:
         enabled: true
         queue_size: 150000
 
-  extensions:
-    health_check:
-      endpoint: "0.0.0.0:13133"
-    memory_ballast:
-      size_in_percentage: 40
-
-  service:
-    extensions:
-      - health_check
-      - memory_ballast
-
     pipelines:
       traces/tailsampling:
         receivers: [otlp]
