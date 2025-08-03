@@ -120,7 +120,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: "http://opentelemetry-trace-collector.monitoring.svc.cluster.local"
+          service: "opentelemetry-trace-collector.monitoring.svc.cluster.local"
           ports:
             - 4317
 
@@ -134,7 +134,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: "http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
+          service: "opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
           ports:
             - 4317
   service:
