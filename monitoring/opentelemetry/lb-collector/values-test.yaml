@@ -3,9 +3,22 @@ mode: deployment
 replicaCount: 1
 
 
-presets:
-  kubernetesAttributes:
-    enabled: true
+clusterRole:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["pods", "namespaces"]
+      verbs: ["get", "watch", "list"]
+    - apiGroups: ["apps", "extensions"]
+      resources: ["replicasets"]
+      verbs: ["get", "watch", "list"]
+
+    - apiGroups: [""]
+      resources: ["endpoints"]
+      verbs: ["get", "watch", "list"]
+
+clusterRoleBinding:
+  create: true
 
 image:
   repository: otel/opentelemetry-collector-contrib
