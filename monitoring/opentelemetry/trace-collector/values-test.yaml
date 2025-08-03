@@ -24,12 +24,11 @@ config:
       limit_percentage: 70
       spike_limit_percentage: 25
 
-    tail_sampling:
-      decision_wait: 30s
-      num_traces: 50000
-      expected_new_traces_per_sec: 1500
-      policies:
-        - type: always_on
+#    tail_sampling:
+#      decision_wait: 30s
+#      num_traces: 50000
+#      expected_new_traces_per_sec: 1500
+#      policies:
 #        [
 #          {
 #            name: 500ms,
@@ -64,5 +63,5 @@ config:
     pipelines:
       traces/tailsampling:
         receivers: [otlp]
-        processors: [tail_sampling, memory_limiter, batch]
+        processors: [memory_limiter, batch]
         exporters: [otlp, debug]
