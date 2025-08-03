@@ -106,7 +106,7 @@ config:
     debug:
       verbosity: detailed
     # loki 엔드포인트
-    otlphttp:
+    otlphttp/loki:
       endpoint: "http://loki-gateway.monitoring.svc.cluster.local/otlp"
       tls:
         insecure: true
@@ -120,7 +120,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: "opentelemetry-trace-collector.monitoring.svc.cluster.local"
+          service: "http://opentelemetry-trace-collector.monitoring.svc.cluster.local"
           ports:
             - 4317
 
@@ -134,7 +134,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: "opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
+          service: "http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
           ports:
             - 4317
   service:
@@ -146,4 +146,4 @@ config:
       logs:
         receivers: [otlp]
         processors: [memory_limiter, k8sattributes, resource, batch]
-        exporters: [otlphttp, debug]
+        exporters: [otlphttp/loki, debug]
