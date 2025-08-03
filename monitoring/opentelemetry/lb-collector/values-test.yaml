@@ -5,6 +5,17 @@ replicaCount: 1
 image:
   repository: otel/opentelemetry-collector-contrib
 
+serviceAccount:
+  create: true
+
+rbac:
+  create: true
+  clusterRole:
+    rules:
+      - apiGroups: [""]
+        resources: ["endpoints", "endpointslices"]
+        verbs: ["get", "list", "watch"]
+
 config:
   receivers:
     otlp:
@@ -106,7 +117,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: http://opentelemetry-trace-collector.monitoring.svc.cluster.local:4317
+          service: "http://opentelemetry-trace-collector.monitoring.svc.cluster.local:4317"
           ports:
             - 4317
 
@@ -120,7 +131,7 @@ config:
             insecure: true
       resolver:
         k8s:
-          service: http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317
+          service: "http://opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
           ports:
             - 4317
   service:
