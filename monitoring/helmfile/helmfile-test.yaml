@@ -39,7 +39,7 @@ releases:
   - name: tempo
     namespace: monitoring
     chart: grafana/tempo-distributed
-    version: 1.42.0
+    version: 1.46.2
     values:
       - "../tempo-distributed/values-test.yaml"
 
