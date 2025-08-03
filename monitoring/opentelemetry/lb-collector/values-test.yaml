@@ -3,12 +3,9 @@ mode: deployment
 replicaCount: 1
 
 
-rbac:
-  create: true
-  rules:
-    - apiGroups: [""]
-      resources: ["endpoints"]
-      verbs: ["get", "list", "watch"]
+presets:
+  kubernetesAttributes:
+    enabled: true
 
 image:
   repository: otel/opentelemetry-collector-contrib
