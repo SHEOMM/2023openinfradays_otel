@@ -8,14 +8,6 @@ image:
 serviceAccount:
   create: true
 
-rbac:
-  create: true
-  clusterRole:
-    rules:
-      - apiGroups: [""]
-        resources: ["endpoints", "endpointslices"]
-        verbs: ["get", "list", "watch"]
-
 config:
   receivers:
     otlp:
