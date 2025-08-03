@@ -52,8 +52,10 @@ config:
   exporters:
     debug:
       verbosity: detailed
-    otlphttp:
+    otlp:
       endpoint: "http://tempo.monitoring.svc.cluster.local:4317"
+      tls:
+        insecure: true
 #      sending_queue:
 #        enabled: true
 #        queue_size: 150000
@@ -62,4 +64,4 @@ config:
       traces/tailsampling:
         receivers: [otlp]
         processors: [tail_sampling, memory_limiter, batch]
-        exporters: [otlphttp, debug]
+        exporters: [otlp, debug]
