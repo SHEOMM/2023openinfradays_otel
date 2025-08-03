@@ -105,7 +105,6 @@ querier:
     enabled: false
 
 compactor:
-  podAntiAffinityType: "none"
   replicas: 1
   resources:
     requests:
@@ -118,7 +117,7 @@ compactor:
     enabled: false
 
 gateway:
-  podAntiAffinityType: "none"
+  affinity: {}
   enabled: true
   replicas: 1
   resources:
