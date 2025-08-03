@@ -38,10 +38,10 @@ releases:
       - minio/minio
   - name: tempo
     namespace: monitoring
-    chart: grafana/tempo-distributed
-    version: 1.46.2
+    chart: grafana/tempo
+    version: 1.23.2
     values:
-      - "../tempo-distributed/values-test.yaml"
+      - "../tempo/values-test.yaml"
 
   - name: opentelemetry-operator
     namespace: opentelemetry-operator-system
