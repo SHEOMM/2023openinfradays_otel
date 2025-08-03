@@ -105,8 +105,9 @@ config:
           tls:
             insecure: true
       resolver:
-        dns:
-          hostname: "opentelemetry-trace-collector.monitoring.svc.cluster.local:4317"
+        k8s:
+          service: "opentelemetry-trace-collector.monitoring.svc.cluster.local"
+          port: 4317
 
     ## spanmetrics : service name 기준으로 라우팅
     loadbalancing/spanmetrics:
@@ -117,8 +118,9 @@ config:
           tls:
             insecure: true
       resolver:
-        dns:
-          hostname: "opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
+        k8s:
+          service: "opentelemetry-metric-collector.monitoring.svc.cluster.local:4317"
+          port: 4317
   service:
     pipelines:
       traces:
