@@ -106,7 +106,7 @@ config:
             insecure: true
       resolver:
         dns:
-          hostname: "otel-trace-collector-headless.monitoring.svc.cluster.local:4317"
+          hostname: "otel-trace-collector-headless.monitoring.svc.cluster.local"
 
     ## spanmetrics : service name 기준으로 라우팅
     loadbalancing/spanmetrics:
