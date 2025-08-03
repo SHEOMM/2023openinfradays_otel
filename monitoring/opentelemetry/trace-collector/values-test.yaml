@@ -29,25 +29,26 @@ config:
       num_traces: 50000
       expected_new_traces_per_sec: 1500
       policies:
-        [
-          {
-            name: 500ms,
-            type: latency,
-            latency: {threshold_ms: 500}
-          },
-
-          {
-            name: error,
-            type: status_code,
-            status_code: { status_codes: [ERROR] }
-          },
-
-          {
-            name: 5percent,
-            type: probabilistic,
-            probabilistic: {sampling_percentage: 5}
-          }
-        ]
+        - type: always_on
+#        [
+#          {
+#            name: 500ms,
+#            type: latency,
+#            latency: {threshold_ms: 500}
+#          },
+#
+#          {
+#            name: error,
+#            type: status_code,
+#            status_code: { status_codes: [ERROR] }
+#          },
+#
+#          {
+#            name: 5percent,
+#            type: probabilistic,
+#            probabilistic: {sampling_percentage: 5}
+#          }
+#        ]
 
   exporters:
     debug:

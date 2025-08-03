@@ -115,7 +115,7 @@ config:
       routing_key: "traceID"
       protocol:
         otlp:
-          timeout: 1s
+          timeout: 10s
           tls:
             insecure: true
       resolver:
@@ -129,7 +129,7 @@ config:
       routing_key: "service"
       protocol:
         otlp:
-          timeout: 1s
+          timeout: 10s
           tls:
             insecure: true
       resolver:
